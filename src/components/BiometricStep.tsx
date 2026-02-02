@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Fingerprint, ScanFace, Check, AlertCircle, Loader2, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -14,7 +14,7 @@ export const BiometricStep = ({ onComplete }: BiometricStepProps) => {
   const [isWebAuthnSupported, setIsWebAuthnSupported] = useState<boolean | null>(null);
 
   // Check WebAuthn support on mount
-  useState(() => {
+  useEffect(() => {
     const checkSupport = async () => {
       try {
         const available = 
@@ -26,7 +26,7 @@ export const BiometricStep = ({ onComplete }: BiometricStepProps) => {
       }
     };
     checkSupport();
-  });
+  }, []);
 
   const startBiometricAuth = async (method: 'fingerprint' | 'face') => {
     setSelectedMethod(method);
