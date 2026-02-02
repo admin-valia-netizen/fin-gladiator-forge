@@ -227,6 +227,21 @@ export const RegistrationForm = () => {
             )}
           </div>
 
+          {/* Legal notice */}
+          <motion.div
+            className="p-4 bg-muted/30 rounded-xl border border-bronze/20"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.35 }}
+          >
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Al registrarte, autorizas al <span className="text-bronze font-medium">Frente de Integridad Nacional (FIN)</span> a 
+              utilizar tus datos exclusivamente para los fines de registro oficial ante la Junta Central Electoral (JCE), 
+              bajo el cumplimiento de la <span className="text-bronze">Ley 172-13</span> de Protección de Datos y la 
+              <span className="text-bronze"> Ley 33-18</span> de Partidos Políticos. Tu información está cifrada y es 100% segura.
+            </p>
+          </motion.div>
+
           {/* Legal acceptance */}
           <motion.div 
             className="card-industrial p-4 rounded-xl space-y-3"
@@ -252,8 +267,7 @@ export const RegistrationForm = () => {
                 className="text-sm text-muted-foreground leading-relaxed cursor-pointer"
               >
                 <CheckSquare className="w-4 h-4 text-bronze inline mr-2" />
-                Acepto que mi identidad sea validada para fines de registro oficial en el partido FIN 
-                <span className="text-bronze"> (Ley 33-18)</span>
+                Acepto los términos de protección de datos y que mi identidad sea validada para fines de registro oficial en el partido FIN.
               </Label>
             </div>
             {errors.legalAccepted && (

@@ -17,20 +17,20 @@ interface Slide {
 const slides: Slide[] = [
   {
     id: 1,
-    title: "El sistema de 'cuñas' se acabó.",
-    subtitle: "Tu talento vale más que un favor político.",
+    title: "EL FIN DEL AMIGUISMO",
+    subtitle: "En la República Dominicana, el talento se apaga cuando las oportunidades se dan por 'cuña'. El Frente de Integridad Nacional (FIN) nace para romper esas cadenas. Somos el partido que limpia el camino para que tú llegues a donde tu esfuerzo te lleve, sin pedirle favores a nadie.",
     image: onboarding1,
   },
   {
     id: 2,
-    title: "¿Qué es ser Gladiador?",
-    subtitle: "Es una mentalidad. No pedimos regalos, forjamos nuestro futuro con mérito e integridad.",
+    title: "TU IDENTIDAD ES TU PODER",
+    subtitle: "Esta plataforma es tu Escalera de Integridad. Aquí no solo te registras; validas quién eres de forma segura y moderna. Usamos biometría para asegurar que nuestra base de datos sea real y poderosa. Al registrarte aquí, proteges tu identidad y te aseguras un lugar en el nuevo gobierno del mérito.",
     image: onboarding2,
   },
   {
     id: 3,
-    title: "FIN es tu escudo.",
-    subtitle: "Regístrate para desbloquear tu 'Botín del Gladiador': Capital semilla, becas tecnológicas y empleos reales.",
+    title: "LA FIRMA QUE CAMBIA TODO",
+    subtitle: "Para que la JCE oficialice nuestro partido, necesitamos tu firma en papel. Esta app es el primer paso: Regístrate digitalmente para validar tu integridad. Ubica tu Mesa de Forja más cercana en el mapa. Firma físicamente para sellar tu compromiso y activar tu acceso al Botín del Gladiador. ¡Tu firma física es el anclaje legal de tu futuro!",
     image: onboarding3,
   },
 ];

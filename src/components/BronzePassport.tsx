@@ -1,8 +1,9 @@
 import { motion } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
-import { Shield, Lock, Gift, Briefcase, Code, Trophy, Wrench, RotateCcw, MapPin } from 'lucide-react';
+import { Shield, Lock, Gift, Briefcase, Code, Trophy, Wrench, RotateCcw, MapPin, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useRegistration } from '@/hooks/useRegistration';
+import { useAuth } from '@/hooks/useAuth';
 import { BotinExplanation } from '@/components/BotinExplanation';
 const benefits = [
   { id: 1, title: 'Capital Semilla', icon: <Gift className="w-5 h-5" />, locked: true },
@@ -27,6 +28,12 @@ const areaLabels = {
 
 export const BronzePassport = () => {
   const { data, resetDemo } = useRegistration();
+  const { signOut } = useAuth();
+
+  const handleLogout = async () => {
+    await signOut();
+    resetDemo();
+  };
 
   return (
     <div className="min-h-screen bg-background flex flex-col p-6">
@@ -193,6 +200,24 @@ export const BronzePassport = () => {
               </motion.div>
             ))}
           </div>
+        </motion.div>
+
+        {/* Logout button */}
+        <motion.div
+          className="w-full mt-8"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.9 }}
+        >
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={handleLogout}
+            className="w-full"
+          >
+            <LogOut className="w-5 h-5 mr-2" />
+            Cerrar Sesión
+          </Button>
         </motion.div>
 
         {/* Demo reset button (hidden in corner) */}
