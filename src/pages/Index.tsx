@@ -21,7 +21,7 @@ const Index = () => {
       try {
         const parsed = JSON.parse(stored);
         // If currentStep is not in the valid steps, reset to splash
-        const validSteps = ['splash', 'onboarding', 'welcome', 'registration', 'staircase', 'passport'];
+        const validSteps = ['splash', 'welcome', 'onboarding', 'registration', 'staircase', 'passport'];
         if (!validSteps.includes(parsed?.state?.currentStep)) {
           resetDemo();
         }
@@ -47,10 +47,15 @@ const Index = () => {
 
   // Show splash screen first (before everything)
   if (currentStep === 'splash') {
-    return <SplashScreen onComplete={() => setStep('onboarding')} />;
+    return <SplashScreen onComplete={() => setStep('welcome')} />;
   }
 
-  // Show onboarding second (before auth)
+  // Show welcome video second (after splash, before onboarding)
+  if (currentStep === 'welcome') {
+    return <WelcomeVideo />;
+  }
+
+  // Show onboarding third (before auth)
   if (currentStep === 'onboarding') {
     return <OnboardingSlides />;
   }
@@ -62,7 +67,6 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {currentStep === 'welcome' && <WelcomeVideo />}
       {currentStep === 'registration' && <RegistrationForm />}
       {currentStep === 'staircase' && <BronzeStaircase />}
       {currentStep === 'passport' && <BronzePassport />}

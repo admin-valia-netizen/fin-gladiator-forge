@@ -69,7 +69,7 @@ export const WelcomeVideo = () => {
           </div>
 
           <motion.button
-            onClick={() => setStep('staircase')}
+            onClick={() => setStep('onboarding')}
             className="group relative px-10 py-4 bg-gradient-neon rounded-xl font-bold text-lg uppercase tracking-widest text-primary-foreground shadow-neon-strong overflow-hidden"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -79,7 +79,7 @@ export const WelcomeVideo = () => {
             
             <span className="relative flex items-center gap-3">
               <Zap className="w-5 h-5" />
-              COMENZAR REGISTRO
+              CONTINUAR
             </span>
           </motion.button>
 
