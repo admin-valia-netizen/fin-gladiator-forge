@@ -74,7 +74,7 @@ export const OnboardingSlides = () => {
     if (currentSlide < slides.length - 1) {
       paginate(1);
     } else {
-      setStep('welcome');
+      setStep('registration');
     }
   };
 
