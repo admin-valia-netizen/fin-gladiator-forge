@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -23,6 +23,7 @@ type RegistrationFormData = z.infer<typeof registrationSchema>;
 
 export const RegistrationForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const submitLockRef = useRef(false);
   const { updateData, setStep } = useRegistration();
 
   const {
@@ -44,9 +45,41 @@ export const RegistrationForm = () => {
   const legalAccepted = watch('legalAccepted');
 
   const onSubmit = async (data: RegistrationFormData) => {
+    if (submitLockRef.current) return;
+    submitLockRef.current = true;
     setIsSubmitting(true);
     
     try {
+      // DB-first check: if the user already registered (same cedula), resume instead of blocking.
+      const { data: existing, error: existingError } = await supabase
+        .from('registrations')
+        .select('id, full_name, cedula, phone, legal_accepted, qr_code')
+        .eq('cedula', data.cedula)
+        .maybeSingle();
+
+      if (existingError) throw existingError;
+
+      if (existing) {
+        // Basic protection: require same phone to continue.
+        if (existing.phone !== data.phone) {
+          toast.error('Esta cédula ya está registrada con otro teléfono.');
+          return;
+        }
+
+        updateData({
+          fullName: existing.full_name,
+          cedula: existing.cedula,
+          phone: existing.phone,
+          legalAccepted: Boolean(existing.legal_accepted),
+          qrCode: existing.qr_code ?? undefined,
+          registrationId: existing.id,
+        });
+
+        toast.success('Encontramos tu registro. Continuando…');
+        setStep('staircase');
+        return;
+      }
+
       // Generate QR code data
       const qrData = `FIN-${data.cedula}-${Date.now()}`;
       
@@ -64,12 +97,35 @@ export const RegistrationForm = () => {
         .single();
 
       if (error) {
+        // Race-safe fallback: if insert failed due to duplicate, fetch and resume.
         if (error.code === '23505') {
+          const { data: dupe, error: dupeError } = await supabase
+            .from('registrations')
+            .select('id, full_name, cedula, phone, legal_accepted, qr_code')
+            .eq('cedula', data.cedula)
+            .maybeSingle();
+
+          if (dupeError) throw dupeError;
+
+          if (dupe && dupe.phone === data.phone) {
+            updateData({
+              fullName: dupe.full_name,
+              cedula: dupe.cedula,
+              phone: dupe.phone,
+              legalAccepted: Boolean(dupe.legal_accepted),
+              qrCode: dupe.qr_code ?? undefined,
+              registrationId: dupe.id,
+            });
+            toast.success('Registro ya existente. Continuando…');
+            setStep('staircase');
+            return;
+          }
+
           toast.error('Esta cédula ya está registrada');
-        } else {
-          throw error;
+          return;
         }
-        return;
+
+        throw error;
       }
 
       // Update local state
@@ -89,6 +145,7 @@ export const RegistrationForm = () => {
       toast.error('Error al registrar. Intenta de nuevo.');
     } finally {
       setIsSubmitting(false);
+      submitLockRef.current = false;
     }
   };
 
