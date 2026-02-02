@@ -7,7 +7,6 @@ import { WelcomeVideo } from '@/components/WelcomeVideo';
 import { RegistrationForm } from '@/components/RegistrationForm';
 import { BronzeStaircase } from '@/components/BronzeStaircase';
 import { BronzePassport } from '@/components/BronzePassport';
-import { AnthemPlayer } from '@/components/AnthemPlayer';
 import { Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
@@ -36,7 +35,6 @@ const Index = () => {
   if (loading && currentStep !== 'splash' && currentStep !== 'onboarding') {
     return (
       <>
-        <AnthemPlayer />
         <div className="min-h-screen bg-background flex items-center justify-center">
           <div className="absolute inset-0 bg-gradient-carbon" />
           <motion.div
@@ -53,7 +51,6 @@ const Index = () => {
   if (currentStep === 'splash') {
     return (
       <>
-        <AnthemPlayer />
         <SplashScreen onComplete={() => setStep('welcome')} />
       </>
     );
@@ -63,7 +60,6 @@ const Index = () => {
   if (currentStep === 'welcome') {
     return (
       <>
-        <AnthemPlayer />
         <WelcomeVideo />
       </>
     );
@@ -73,7 +69,6 @@ const Index = () => {
   if (currentStep === 'onboarding') {
     return (
       <>
-        <AnthemPlayer />
         <OnboardingSlides />
       </>
     );
@@ -86,7 +81,6 @@ const Index = () => {
 
   return (
     <>
-      <AnthemPlayer />
       <div className="min-h-screen bg-background">
         {currentStep === 'registration' && <RegistrationForm />}
         {currentStep === 'staircase' && <BronzeStaircase />}
