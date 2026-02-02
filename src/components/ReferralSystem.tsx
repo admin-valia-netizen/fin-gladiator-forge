@@ -32,27 +32,48 @@ export const ReferralSystem = ({ referralCode, registrationId }: ReferralSystemP
   const [copied, setCopied] = useState(false);
   const [referrals, setReferrals] = useState<Referral[]>([]);
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [userReferralCode, setUserReferralCode] = useState(referralCode);
 
-  // Fetch user's referral code if not provided
+  // Fetch user's referral code and initial referral count on mount
   useEffect(() => {
-    const fetchReferralCode = async () => {
-      if (!userReferralCode && registrationId) {
+    const initialize = async () => {
+      let code = referralCode;
+      
+      // If no referral code provided, fetch from DB
+      if (!code && registrationId) {
         const { data } = await supabase
           .from('registrations')
-          .select('referral_code')
+          .select('referral_code, cedula')
           .eq('id', registrationId)
           .maybeSingle();
         
-        if (data?.referral_code) {
-          setUserReferralCode(data.referral_code);
+        // Generate code locally if not in DB
+        code = data?.referral_code || (data?.cedula ? `FIN-${data.cedula}` : undefined);
+      }
+      
+      if (code) {
+        setUserReferralCode(code);
+        
+        // Fetch initial referral count
+        const { data: refs, error } = await supabase
+          .from('registrations')
+          .select('id, full_name, passport_level, created_at')
+          .eq('referred_by', code)
+          .order('created_at', { ascending: false });
+        
+        if (!error && refs) {
+          setReferrals(refs);
         }
       }
+      
+      setInitialLoading(false);
     };
-    fetchReferralCode();
-  }, [registrationId, userReferralCode]);
+    
+    initialize();
+  }, [referralCode, registrationId]);
 
-  // Fetch referrals when dialog opens
+  // Refresh referrals when dialog opens
   useEffect(() => {
     const fetchReferrals = async () => {
       if (!isOpen || !userReferralCode) return;
@@ -135,9 +156,10 @@ export const ReferralSystem = ({ referralCode, registrationId }: ReferralSystemP
         <Button
           variant="outline"
           className="w-full border-amber-500/30 bg-amber-500/10 text-amber-500 hover:bg-amber-500/20"
+          disabled={initialLoading}
         >
           <Users className="w-4 h-4 mr-2" />
-          Mis Referidos ({referrals.length}/{REQUIRED_REFERRALS})
+          {initialLoading ? 'Cargando...' : `Mis Referidos (${referrals.length}/${REQUIRED_REFERRALS})`}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-md max-h-[85vh] overflow-hidden bg-background/95 backdrop-blur-xl border-bronze/30">
