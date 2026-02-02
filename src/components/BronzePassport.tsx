@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
-import { Shield, Lock, Gift, Briefcase, Code, Trophy, Wrench, RotateCcw } from 'lucide-react';
+import { Shield, Lock, Gift, Briefcase, Code, Trophy, Wrench, RotateCcw, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useRegistration } from '@/hooks/useRegistration';
 
@@ -123,20 +123,43 @@ export const BronzePassport = () => {
           <div className="h-2 bg-gradient-bronze" />
         </motion.div>
 
+        {/* Important next steps message */}
+        <motion.div
+          className="w-full mt-6 card-industrial p-5 rounded-xl border-l-4 border-primary"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+        >
+          <h3 className="font-bold text-foreground mb-3 flex items-center gap-2">
+            <MapPin className="w-5 h-5 text-primary" />
+            ¿Qué sigue ahora?
+          </h3>
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            Ahora tienes que ir a la <span className="text-primary font-semibold">Mesa de FIN más cercana a ti</span> para 
+            firmar físicamente y validar tu registro.
+          </p>
+          <p className="text-sm text-muted-foreground leading-relaxed mt-3">
+            Una vez que vayas a votar por <span className="text-primary font-semibold">"FIN" Frente de Integridad Nacional</span> y 
+            valides el día de la votación con tu <span className="text-bronze-metallic font-semibold">dedo entintado</span> y la 
+            foto del dedo, selfie con el centro electoral donde hayas votado, se desbloqueará automáticamente 
+            tu <span className="text-bronze-metallic font-semibold">BOTÍN seleccionado</span>.
+          </p>
+          <p className="text-sm text-primary font-semibold mt-3">
+            Recuerda que está sujeto a que ganemos las elecciones... ¡por eso ayúdanos a traer más gladiadores y te ayudaremos!
+          </p>
+        </motion.div>
+
         {/* Locked benefits */}
         <motion.div
-          className="w-full mt-8 space-y-4"
+          className="w-full mt-6 space-y-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.6 }}
+          transition={{ delay: 0.7 }}
         >
           <h2 className="text-center font-bold text-foreground flex items-center justify-center gap-2">
             <Lock className="w-4 h-4 text-muted-foreground" />
-            Beneficios Bloqueados
+            Tu Botín (Bloqueado)
           </h2>
-          <p className="text-center text-sm text-muted-foreground mb-4">
-            Se activarán al confirmar tu voto (dedo entintado)
-          </p>
 
           <div className="grid grid-cols-2 gap-3">
             {benefits.map((benefit, index) => (
@@ -145,7 +168,7 @@ export const BronzePassport = () => {
                 className="p-4 rounded-xl bg-muted/50 border border-muted flex items-center gap-3 opacity-60"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 0.6, x: 0 }}
-                transition={{ delay: 0.7 + index * 0.1 }}
+                transition={{ delay: 0.8 + index * 0.1 }}
               >
                 <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
                   {benefit.icon}
