@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Coins, Laptop, Anchor, ShieldPlus, FileSignature, Vote, Camera } from 'lucide-react';
+import { Coins, Laptop, Anchor, ShieldPlus, FileSignature, Vote, Camera, Users, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -47,6 +47,12 @@ const steps = [
     description: 'Regístrate en esta app y firma físicamente en nuestras mesas oficiales de FIN.',
   },
   {
+    icon: <Users className="w-6 h-6" />,
+    title: 'EL RECLUTAMIENTO',
+    description: 'Tienes hasta el día antes de las elecciones para referir a 50 nuevos Gladiadores que completen la Escalera de Bronce.',
+    highlight: true,
+  },
+  {
     icon: <Vote className="w-6 h-6" />,
     title: 'LA ACCIÓN',
     description: 'El día de las elecciones, cumple con tu patria y vota con integridad.',
@@ -54,7 +60,7 @@ const steps = [
   {
     icon: <Camera className="w-6 h-6" />,
     title: 'EL SELLO',
-    description: 'Sube a esta app tu selfie con el dedo entintado.',
+    description: 'Sube a esta app tu selfie con el dedo entintado frente al centro electoral.',
   },
 ];
 
@@ -139,7 +145,7 @@ export const BotinExplanation = () => {
                 ¿Cómo Reclamar Tu Botín?
               </p>
               <p className="text-xs text-muted-foreground mt-1">
-                Es un pacto de integridad en tres pasos:
+                Es un pacto de integridad en cuatro pasos:
               </p>
             </div>
 
@@ -150,18 +156,55 @@ export const BotinExplanation = () => {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.6 + index * 0.1 }}
-                  className="flex items-start gap-3 p-3 rounded-lg bg-muted/30"
+                  className={`flex items-start gap-3 p-3 rounded-lg ${
+                    step.highlight 
+                      ? 'bg-amber-500/10 border border-amber-500/30' 
+                      : 'bg-muted/30'
+                  }`}
                 >
-                  <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary shrink-0">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
+                    step.highlight 
+                      ? 'bg-amber-500/20 text-amber-500' 
+                      : 'bg-primary/20 text-primary'
+                  }`}>
                     {step.icon}
                   </div>
                   <div>
-                    <h5 className="font-bold text-sm text-foreground">{step.title}</h5>
+                    <h5 className={`font-bold text-sm ${step.highlight ? 'text-amber-500' : 'text-foreground'}`}>
+                      {step.title}
+                    </h5>
                     <p className="text-xs text-muted-foreground">{step.description}</p>
                   </div>
                 </motion.div>
               ))}
             </div>
+
+            {/* Critical warning about referrals */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.85 }}
+              className="p-4 rounded-xl bg-destructive/10 border-2 border-destructive/30"
+            >
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="w-6 h-6 text-destructive shrink-0" />
+                <div>
+                  <h5 className="font-bold text-sm text-destructive mb-1">
+                    ⚠️ REGLA CRÍTICA
+                  </h5>
+                  <p className="text-xs text-foreground leading-relaxed">
+                    Si <span className="font-bold text-destructive">todos tus 50 referidos</span> completan la 
+                    Escalera de Bronce, <span className="font-bold text-primary">TODOS reciben su Botín</span>.
+                  </p>
+                  <p className="text-xs text-destructive font-bold mt-2">
+                    Pero si 1 SOLO falla... ¡NADIE recibe el Botín!
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Elige bien a tus Gladiadores. Tu éxito depende del compromiso de todos.
+                  </p>
+                </div>
+              </div>
+            </motion.div>
           </motion.div>
 
           {/* Result */}
