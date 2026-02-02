@@ -12,8 +12,8 @@ const Index = () => {
   const { currentStep } = useRegistration();
   const { isAuthenticated, loading } = useAuth();
 
-  // Show loading state
-  if (loading) {
+  // Show loading state only after onboarding
+  if (loading && currentStep !== 'onboarding') {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="absolute inset-0 bg-gradient-carbon" />
@@ -26,14 +26,18 @@ const Index = () => {
     );
   }
 
-  // Redirect to auth if not authenticated
+  // Show onboarding first (before auth)
+  if (currentStep === 'onboarding') {
+    return <OnboardingSlides />;
+  }
+
+  // After onboarding, require auth for all other steps
   if (!isAuthenticated) {
     return <Navigate to="/auth" replace />;
   }
 
   return (
     <div className="min-h-screen bg-background">
-      {currentStep === 'onboarding' && <OnboardingSlides />}
       {currentStep === 'welcome' && <WelcomeVideo />}
       {currentStep === 'registration' && <RegistrationForm />}
       {currentStep === 'staircase' && <BronzeStaircase />}
