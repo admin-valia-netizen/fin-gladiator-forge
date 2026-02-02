@@ -3,7 +3,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { Shield, Lock, Gift, Briefcase, Code, Trophy, Wrench, RotateCcw, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useRegistration } from '@/hooks/useRegistration';
-
+import { BotinExplanation } from '@/components/BotinExplanation';
 const benefits = [
   { id: 1, title: 'Capital Semilla', icon: <Gift className="w-5 h-5" />, locked: true },
   { id: 2, title: 'Becas Tecnológicas', icon: <Code className="w-5 h-5" />, locked: true },
@@ -147,6 +147,16 @@ export const BronzePassport = () => {
           <p className="text-sm text-primary font-semibold mt-3">
             Recuerda que está sujeto a que ganemos las elecciones... ¡por eso ayúdanos a traer más gladiadores y te ayudaremos!
           </p>
+        </motion.div>
+
+        {/* Botin explanation button */}
+        <motion.div
+          className="w-full mt-4"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+        >
+          <BotinExplanation />
         </motion.div>
 
         {/* Locked benefits */}
