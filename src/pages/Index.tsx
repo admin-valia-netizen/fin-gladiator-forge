@@ -1,12 +1,20 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useRegistration } from '@/hooks/useRegistration';
+import { OnboardingSlides } from '@/components/OnboardingSlides';
+import { WelcomeVideo } from '@/components/WelcomeVideo';
+import { RegistrationForm } from '@/components/RegistrationForm';
+import { BronzeStaircase } from '@/components/BronzeStaircase';
+import { BronzePassport } from '@/components/BronzePassport';
 
 const Index = () => {
+  const { currentStep } = useRegistration();
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen bg-background">
+      {currentStep === 'onboarding' && <OnboardingSlides />}
+      {currentStep === 'welcome' && <WelcomeVideo />}
+      {currentStep === 'registration' && <RegistrationForm />}
+      {currentStep === 'staircase' && <BronzeStaircase />}
+      {currentStep === 'passport' && <BronzePassport />}
     </div>
   );
 };
