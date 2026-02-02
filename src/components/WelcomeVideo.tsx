@@ -27,15 +27,15 @@ export const WelcomeVideo = () => {
       
       {/* Video container */}
       {!videoEnded && (
-        <div className="absolute inset-0 z-10">
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-black">
           <video
             ref={videoRef}
             src={gladiatorVideo}
             autoPlay
             playsInline
-            muted={false}
+            muted
             onEnded={handleVideoEnd}
-            className="w-full h-full object-cover"
+            className="max-w-full max-h-full w-auto h-auto object-contain"
           />
           
           {/* Skip button */}
@@ -69,7 +69,7 @@ export const WelcomeVideo = () => {
           </div>
 
           <motion.button
-            onClick={() => setStep('registration')}
+            onClick={() => setStep('staircase')}
             className="group relative px-10 py-4 bg-gradient-neon rounded-xl font-bold text-lg uppercase tracking-widest text-primary-foreground shadow-neon-strong overflow-hidden"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
