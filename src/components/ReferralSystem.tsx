@@ -92,23 +92,36 @@ export const ReferralSystem = ({ referralCode, registrationId }: ReferralSystemP
   };
 
   const handleShare = async () => {
-    if (!userReferralCode) return;
+    if (!userReferralCode) {
+      toast.error('No hay código de referido disponible');
+      return;
+    }
 
-    const shareText = `🏛️ ¡Únete a FIN como Gladiador!\n\nUsa mi código de referido: ${userReferralCode}\n\nDescarga la app y regístrate para ser parte de la revolución.`;
+    const shareUrl = `${window.location.origin}?ref=${userReferralCode}`;
+    const shareText = `🏛️ ¡Únete a FIN como Gladiador!\n\nUsa mi código de referido: ${userReferralCode}\n\nRegístrate aquí: ${shareUrl}`;
     
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'FIN - Frente de Integración Nacional',
+          title: 'FIN - Frente de Integridad Nacional',
           text: shareText,
+          url: shareUrl,
         });
-      } catch (error) {
-        // User cancelled or error
-        console.log('Share cancelled');
+        toast.success('¡Compartido exitosamente!');
+      } catch (error: any) {
+        // User cancelled sharing - try copy as fallback
+        if (error.name !== 'AbortError') {
+          await handleCopyCode();
+        }
       }
     } else {
-      // Fallback to copy
-      await handleCopyCode();
+      // Fallback to copy for browsers without Web Share API
+      try {
+        await navigator.clipboard.writeText(shareText);
+        toast.success('¡Enlace copiado al portapapeles!');
+      } catch {
+        toast.error('Error al copiar. Copia manualmente: ' + userReferralCode);
+      }
     }
   };
 
