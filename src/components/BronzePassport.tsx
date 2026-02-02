@@ -1,10 +1,11 @@
 import { motion } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
-import { Shield, Lock, Gift, Briefcase, Code, Trophy, Wrench, RotateCcw, MapPin, LogOut } from 'lucide-react';
+import { Shield, Lock, Gift, Briefcase, Code, Trophy, Wrench, RotateCcw, MapPin, LogOut, Vote } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useRegistration } from '@/hooks/useRegistration';
 import { useAuth } from '@/hooks/useAuth';
 import { BotinExplanation } from '@/components/BotinExplanation';
+
 const benefits = [
   { id: 1, title: 'Capital Semilla', icon: <Gift className="w-5 h-5" />, locked: true },
   { id: 2, title: 'Becas Tecnológicas', icon: <Code className="w-5 h-5" />, locked: true },
@@ -27,12 +28,16 @@ const areaLabels = {
 };
 
 export const BronzePassport = () => {
-  const { data, resetDemo } = useRegistration();
+  const { data, resetDemo, setStep } = useRegistration();
   const { signOut } = useAuth();
 
   const handleLogout = async () => {
     await signOut();
     resetDemo();
+  };
+
+  const handleValidateVote = () => {
+    setStep('vote-validation');
   };
 
   return (
@@ -130,6 +135,24 @@ export const BronzePassport = () => {
           <div className="h-2 bg-gradient-bronze" />
         </motion.div>
 
+        {/* Vote validation CTA */}
+        <motion.div
+          className="w-full mt-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.45 }}
+        >
+          <Button
+            variant="gladiator"
+            size="xl"
+            onClick={handleValidateVote}
+            className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 shadow-[0_0_20px_rgba(245,158,11,0.3)]"
+          >
+            <Vote className="w-5 h-5 mr-2" />
+            YA VOTÉ - VALIDAR MI VOTO
+          </Button>
+        </motion.div>
+
         {/* Important next steps message */}
         <motion.div
           className="w-full mt-6 card-industrial p-5 rounded-xl border-l-4 border-primary"
@@ -142,17 +165,16 @@ export const BronzePassport = () => {
             ¿Qué sigue ahora?
           </h3>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            Ahora tienes que ir a la <span className="text-primary font-semibold">Mesa de FIN más cercana a ti</span> para 
-            firmar físicamente y validar tu registro.
+            1. Ve a la <span className="text-primary font-semibold">Mesa de FIN más cercana</span> para firmar físicamente.
           </p>
-          <p className="text-sm text-muted-foreground leading-relaxed mt-3">
-            Una vez que vayas a votar por <span className="text-primary font-semibold">"FIN" Frente de Integridad Nacional</span> y 
-            valides el día de la votación con tu <span className="text-bronze-metallic font-semibold">dedo entintado</span> y la 
-            foto del dedo, selfie con el centro electoral donde hayas votado, se desbloqueará automáticamente 
-            tu <span className="text-bronze-metallic font-semibold">BOTÍN seleccionado</span>.
+          <p className="text-sm text-muted-foreground leading-relaxed mt-2">
+            2. El día de las elecciones, vota por <span className="text-primary font-semibold">"FIN" Frente de Integridad Nacional</span>.
           </p>
-          <p className="text-sm text-primary font-semibold mt-3">
-            Recuerda que está sujeto a que ganemos las elecciones... ¡por eso ayúdanos a traer más gladiadores y te ayudaremos!
+          <p className="text-sm text-muted-foreground leading-relaxed mt-2">
+            3. Después de votar, regresa aquí y presiona <span className="text-amber-500 font-semibold">"YA VOTÉ"</span> para subir tu selfie con el dedo entintado.
+          </p>
+          <p className="text-sm text-amber-500 font-semibold mt-3">
+            ¡Desbloquea tu Pasaporte Dorado y accede al Botín si ganamos!
           </p>
         </motion.div>
 
