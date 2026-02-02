@@ -1,10 +1,11 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useRef, useCallback } from 'react';
-import { Shield, Hand, Camera, MapPin, Check, Loader2 } from 'lucide-react';
+import { Shield, Hand, Camera, MapPin, Check, Loader2, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useRegistration } from '@/hooks/useRegistration';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { BiometricStep } from './BiometricStep';
 
 interface Step {
   id: number;
@@ -28,6 +29,12 @@ const steps: Step[] = [
   },
   {
     id: 3,
+    title: 'Validación Biométrica',
+    description: 'Huella o reconocimiento facial',
+    icon: <ShieldCheck className="w-6 h-6" />,
+  },
+  {
+    id: 4,
     title: 'El Botín y El Anclaje',
     description: 'Elige tu área y confirma',
     icon: <MapPin className="w-6 h-6" />,
@@ -83,6 +90,9 @@ export const BronzeStaircase = () => {
             <EvidenceStep key="evidence" onComplete={() => setStaircaseStep(3)} />
           )}
           {staircaseStep === 3 && (
+            <BiometricStep key="biometric" onComplete={() => setStaircaseStep(4)} />
+          )}
+          {staircaseStep === 4 && (
             <ChoiceStep key="choice" onComplete={() => setStep('passport')} />
           )}
         </AnimatePresence>
