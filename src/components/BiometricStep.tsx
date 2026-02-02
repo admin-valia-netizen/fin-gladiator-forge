@@ -114,10 +114,6 @@ export const BiometricStep = ({ onComplete }: BiometricStepProps) => {
     }
   };
 
-  const skipBiometric = () => {
-    toast.info('Validación biométrica omitida');
-    onComplete();
-  };
 
   return (
     <motion.div
@@ -189,32 +185,23 @@ export const BiometricStep = ({ onComplete }: BiometricStepProps) => {
             </motion.button>
           </div>
 
-          {/* Skip option for devices without biometric support */}
+          {/* Warning for devices without biometric support */}
           {isWebAuthnSupported === false && (
-            <div className="card-industrial p-4 rounded-xl border-l-4 border-amber-500">
+            <div className="card-industrial p-4 rounded-xl border-l-4 border-destructive">
               <div className="flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+                <AlertCircle className="w-5 h-5 text-destructive shrink-0 mt-0.5" />
                 <div>
                   <p className="text-sm text-foreground font-medium">
-                    Biometría no disponible
+                    Biometría requerida
                   </p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Tu dispositivo no soporta autenticación biométrica. 
-                    Puedes continuar sin esta validación.
+                    Tu dispositivo no soporta autenticación biométrica.
+                    Por favor, usa un dispositivo con Touch ID, Face ID o lector de huellas.
                   </p>
                 </div>
               </div>
             </div>
           )}
-
-          <Button
-            variant="ghost"
-            size="lg"
-            onClick={skipBiometric}
-            className="w-full text-muted-foreground hover:text-foreground"
-          >
-            Omitir este paso
-          </Button>
         </motion.div>
       )}
 
