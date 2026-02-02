@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Volume2, VolumeX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRegistration } from "@/hooks/useRegistration";
+import { useAuth } from "@/hooks/useAuth";
 
 import himnoFin from "@/assets/himno-fin.mp3";
 
@@ -9,6 +10,7 @@ const STORAGE_KEY = "fin-anthem-enabled";
 
 export const AnthemPlayer = () => {
   const { currentStep } = useRegistration();
+  const { isAuthenticated } = useAuth();
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const [enabled, setEnabled] = useState<boolean>(() => {
@@ -29,6 +31,14 @@ export const AnthemPlayer = () => {
     if (currentStep === "welcome") return false;
     return true;
   }, [enabled, currentStep]);
+
+  // Stop audio immediately when user logs out
+  useEffect(() => {
+    if (!isAuthenticated && audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+  }, [isAuthenticated]);
 
   useEffect(() => {
     const audio = new Audio(himnoFin);
