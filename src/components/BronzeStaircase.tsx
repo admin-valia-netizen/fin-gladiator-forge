@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useRef, useCallback } from 'react';
-import { Shield, Hand, Camera, MapPin, Check, Loader2, ShieldCheck } from 'lucide-react';
+import { Shield, Hand, Camera, MapPin, Check, Loader2, ShieldCheck, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useRegistration } from '@/hooks/useRegistration';
 import { supabase } from '@/integrations/supabase/client';
@@ -43,6 +43,14 @@ const steps: Step[] = [
 
 export const BronzeStaircase = () => {
   const { staircaseStep, setStaircaseStep, data, updateData, setStep } = useRegistration();
+
+  const handleBack = () => {
+    if (staircaseStep > 1) {
+      setStaircaseStep(staircaseStep - 1);
+    } else {
+      setStep('registration');
+    }
+  };
   
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -55,6 +63,17 @@ export const BronzeStaircase = () => {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
       >
+        {/* Back button */}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handleBack}
+          className="text-muted-foreground hover:text-foreground mb-4"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          {staircaseStep > 1 ? 'Paso anterior' : 'Volver al registro'}
+        </Button>
+
         <div className="flex items-center gap-3 mb-6">
           <Shield className="w-8 h-8 text-primary" />
           <div>

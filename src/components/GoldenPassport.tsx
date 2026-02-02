@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
-import { Shield, Gift, Briefcase, Code, Trophy, Wrench, RotateCcw, Crown, LogOut, Sparkles, CheckCircle } from 'lucide-react';
+import { Shield, Gift, Briefcase, Code, Trophy, Wrench, RotateCcw, Crown, LogOut, Sparkles, CheckCircle, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useRegistration } from '@/hooks/useRegistration';
 import { useAuth } from '@/hooks/useAuth';
@@ -27,12 +27,16 @@ const areaLabels = {
 };
 
 export const GoldenPassport = () => {
-  const { data, resetDemo } = useRegistration();
+  const { data, resetDemo, setStep } = useRegistration();
   const { signOut } = useAuth();
 
   const handleLogout = async () => {
     await signOut();
     resetDemo();
+  };
+
+  const handleBack = () => {
+    setStep('passport');
   };
 
   return (
@@ -70,6 +74,23 @@ export const GoldenPassport = () => {
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5 }}
       >
+        {/* Back button */}
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="self-start mb-4"
+        >
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleBack}
+            className="text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Volver al Pasaporte de Bronce
+          </Button>
+        </motion.div>
+
         {/* Success message */}
         <motion.div
           className="text-center mb-8"
