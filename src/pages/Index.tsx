@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useRegistration } from '@/hooks/useRegistration';
 import { useAuth } from '@/hooks/useAuth';
 import { SplashScreen } from '@/components/SplashScreen';
@@ -10,8 +11,25 @@ import { Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
 const Index = () => {
-  const { currentStep, setStep } = useRegistration();
+  const { currentStep, setStep, resetDemo } = useRegistration();
   const { isAuthenticated, loading } = useAuth();
+
+  // Force splash on first load if state is corrupted or old format
+  useEffect(() => {
+    const stored = localStorage.getItem('fin-registration');
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        // If currentStep is not in the valid steps, reset to splash
+        const validSteps = ['splash', 'onboarding', 'welcome', 'registration', 'staircase', 'passport'];
+        if (!validSteps.includes(parsed?.state?.currentStep)) {
+          resetDemo();
+        }
+      } catch {
+        resetDemo();
+      }
+    }
+  }, [resetDemo]);
 
   // Show loading state only after splash and onboarding
   if (loading && currentStep !== 'splash' && currentStep !== 'onboarding') {
