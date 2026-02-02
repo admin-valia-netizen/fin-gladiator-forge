@@ -178,11 +178,25 @@ export const BotinExplanation = () => {
             </p>
           </motion.div>
 
-          {/* CTA */}
+          {/* Important note */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1 }}
+            className="p-3 rounded-lg bg-primary/10 border border-primary/30"
+          >
+            <p className="text-sm text-foreground leading-relaxed text-center">
+              Naturalmente se dará <span className="font-bold text-primary">si Ganamos las elecciones</span>, 
+              sino NO, así que <span className="font-bold text-bronze-metallic">trae a tus Amigos</span> y 
+              hazlos <span className="font-bold text-primary">Gladiadores de FIN</span>.
+            </p>
+          </motion.div>
+
+          {/* CTA */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.1 }}
             className="text-center pt-2"
           >
             <p className="text-lg font-bold text-primary uppercase tracking-wide">
