@@ -220,21 +220,21 @@ export const BronzePassport = () => {
           </Button>
         </motion.div>
 
-        {/* Demo reset button (hidden in corner) */}
+        {/* Demo reset button - visible for testing */}
         <motion.div
-          className="absolute top-4 right-4"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          className="w-full mt-4"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1 }}
         >
           <Button
             variant="ghost"
-            size="icon"
+            size="lg"
             onClick={resetDemo}
-            className="opacity-30 hover:opacity-100"
-            title="Reiniciar Demo"
+            className="w-full text-muted-foreground hover:text-foreground"
           >
-            <RotateCcw className="w-4 h-4" />
+            <RotateCcw className="w-4 h-4 mr-2" />
+            Ver Demo Completa (Reiniciar)
           </Button>
         </motion.div>
       </motion.div>
