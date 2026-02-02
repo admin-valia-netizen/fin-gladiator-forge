@@ -6,6 +6,7 @@ import gladiatorVideo from '@/assets/gladiator-intro.mp4';
 
 export const WelcomeVideo = () => {
   const [videoEnded, setVideoEnded] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
   const { setStep } = useRegistration();
 
@@ -20,6 +21,23 @@ export const WelcomeVideo = () => {
     setVideoEnded(true);
   };
 
+  const toggleSound = async () => {
+    const nextMuted = !isMuted;
+    setIsMuted(nextMuted);
+
+    const video = videoRef.current;
+    if (!video) return;
+
+    video.muted = nextMuted;
+    if (!nextMuted) {
+      try {
+        await video.play();
+      } catch {
+        // Si el navegador bloquea, el usuario puede intentar de nuevo.
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center overflow-hidden relative">
       {/* Background effects */}
@@ -27,13 +45,13 @@ export const WelcomeVideo = () => {
       
       {/* Video container */}
       {!videoEnded && (
-        <div className="absolute inset-0 z-10 flex items-center justify-center bg-black">
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-background">
           <video
             ref={videoRef}
             src={gladiatorVideo}
             autoPlay
             playsInline
-            muted
+            muted={isMuted}
             onEnded={handleVideoEnd}
             className="max-w-full max-h-full w-auto h-auto object-contain"
           />
@@ -47,6 +65,17 @@ export const WelcomeVideo = () => {
             transition={{ delay: 1 }}
           >
             Saltar
+          </motion.button>
+
+          {/* Sound toggle (autoplay con sonido suele estar bloqueado en móviles) */}
+          <motion.button
+            onClick={toggleSound}
+            className="absolute bottom-8 left-8 px-4 py-2 bg-card/80 backdrop-blur-sm rounded-lg text-muted-foreground hover:text-foreground transition-colors border border-bronze/30"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1 }}
+          >
+            {isMuted ? 'Activar sonido' : 'Silenciar'}
           </motion.button>
         </div>
       )}

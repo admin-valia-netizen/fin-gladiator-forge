@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useRef, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { User, CreditCard, Phone, CheckSquare, ArrowRight, Shield } from 'lucide-react';
@@ -28,9 +28,8 @@ export const RegistrationForm = () => {
 
   const {
     register,
+    control,
     handleSubmit,
-    setValue,
-    watch,
     formState: { errors },
   } = useForm<RegistrationFormData>({
     resolver: zodResolver(registrationSchema),
@@ -41,8 +40,6 @@ export const RegistrationForm = () => {
       legalAccepted: false,
     },
   });
-
-  const legalAccepted = watch('legalAccepted');
 
   const onSubmit = async (data: RegistrationFormData) => {
     if (submitLockRef.current) return;
@@ -177,9 +174,6 @@ export const RegistrationForm = () => {
         transition={{ delay: 0.2 }}
       >
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          {/* Ensure non-native inputs are registered with react-hook-form */}
-          <input type="hidden" {...register('legalAccepted')} />
-
           {/* Full Name */}
           <div className="space-y-2">
             <Label htmlFor="fullName" className="flex items-center gap-2 text-foreground">
@@ -241,16 +235,17 @@ export const RegistrationForm = () => {
             transition={{ delay: 0.4 }}
           >
             <div className="flex items-start gap-3">
-              <Checkbox
-                id="legalAccepted"
-                checked={legalAccepted}
-                onCheckedChange={(checked) =>
-                  setValue('legalAccepted', checked === true, {
-                    shouldDirty: true,
-                    shouldValidate: true,
-                  })
-                }
-                className="mt-1 border-bronze data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+              <Controller
+                name="legalAccepted"
+                control={control}
+                render={({ field }) => (
+                  <Checkbox
+                    id="legalAccepted"
+                    checked={Boolean(field.value)}
+                    onCheckedChange={(checked) => field.onChange(checked === true)}
+                    className="mt-1 border-bronze data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                  />
+                )}
               />
               <Label 
                 htmlFor="legalAccepted" 
