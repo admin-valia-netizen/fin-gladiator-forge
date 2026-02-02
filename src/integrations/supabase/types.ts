@@ -28,6 +28,8 @@ export type Database = {
           passport_level: string | null
           phone: string
           qr_code: string | null
+          referral_code: string | null
+          referred_by: string | null
           selfie_url: string | null
           signature_confirmed: boolean | null
           updated_at: string
@@ -48,6 +50,8 @@ export type Database = {
           passport_level?: string | null
           phone: string
           qr_code?: string | null
+          referral_code?: string | null
+          referred_by?: string | null
           selfie_url?: string | null
           signature_confirmed?: boolean | null
           updated_at?: string
@@ -68,6 +72,8 @@ export type Database = {
           passport_level?: string | null
           phone?: string
           qr_code?: string | null
+          referral_code?: string | null
+          referred_by?: string | null
           selfie_url?: string | null
           signature_confirmed?: boolean | null
           updated_at?: string
