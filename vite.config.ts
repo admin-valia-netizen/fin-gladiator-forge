@@ -49,7 +49,10 @@ export default defineConfig(({ mode }) => ({
         ],
       },
       workbox: {
-        globPatterns: ["**/*.{js,css,html,ico,png,svg,mp4,mp3,jpg,jpeg,webp}"],
+        globPatterns: ["**/*.{js,css,html,ico,png,svg,jpg,jpeg,webp}"],
+        // Exclude large media files from precaching - they'll be fetched on demand
+        globIgnores: ["**/*.mp4", "**/*.mp3"],
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5 MiB
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
@@ -60,6 +63,19 @@ export default defineConfig(({ mode }) => ({
                 maxEntries: 10,
                 maxAgeSeconds: 60 * 60 * 24 * 365, // 1 year
               },
+            },
+          },
+          {
+            // Cache media files on demand (not precached)
+            urlPattern: /\.(?:mp3|mp4)$/i,
+            handler: "CacheFirst",
+            options: {
+              cacheName: "media-cache",
+              expiration: {
+                maxEntries: 10,
+                maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
+              },
+              rangeRequests: true,
             },
           },
         ],
