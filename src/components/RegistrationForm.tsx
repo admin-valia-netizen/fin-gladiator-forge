@@ -47,10 +47,14 @@ export const RegistrationForm = () => {
     setIsSubmitting(true);
     
     try {
+      // Check if user has a referral code in URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const referredByCode = urlParams.get('ref');
+
       // DB-first check: if the user already registered (same cedula), resume instead of blocking.
       const { data: existing, error: existingError } = await supabase
         .from('registrations')
-        .select('id, full_name, cedula, phone, legal_accepted, qr_code')
+        .select('id, full_name, cedula, phone, legal_accepted, qr_code, referral_code')
         .eq('cedula', data.cedula)
         .maybeSingle();
 
@@ -70,6 +74,7 @@ export const RegistrationForm = () => {
           legalAccepted: Boolean(existing.legal_accepted),
           qrCode: existing.qr_code ?? undefined,
           registrationId: existing.id,
+          referralCode: existing.referral_code ?? undefined,
         });
 
         toast.success('Encontramos tu registro. Continuando…');
@@ -80,16 +85,23 @@ export const RegistrationForm = () => {
       // Generate QR code data
       const qrData = `FIN-${data.cedula}-${Date.now()}`;
       
-      // Save to Supabase
+      // Save to Supabase (with optional referral)
+      const insertData: any = {
+        full_name: data.fullName,
+        cedula: data.cedula,
+        phone: data.phone,
+        legal_accepted: data.legalAccepted,
+        qr_code: qrData,
+      };
+
+      // Add referral code if user was referred
+      if (referredByCode) {
+        insertData.referred_by = referredByCode;
+      }
+
       const { data: registration, error } = await supabase
         .from('registrations')
-        .insert({
-          full_name: data.fullName,
-          cedula: data.cedula,
-          phone: data.phone,
-          legal_accepted: data.legalAccepted,
-          qr_code: qrData,
-        })
+        .insert(insertData)
         .select()
         .single();
 
@@ -98,7 +110,7 @@ export const RegistrationForm = () => {
         if (error.code === '23505') {
           const { data: dupe, error: dupeError } = await supabase
             .from('registrations')
-            .select('id, full_name, cedula, phone, legal_accepted, qr_code')
+            .select('id, full_name, cedula, phone, legal_accepted, qr_code, referral_code')
             .eq('cedula', data.cedula)
             .maybeSingle();
 
@@ -112,6 +124,7 @@ export const RegistrationForm = () => {
               legalAccepted: Boolean(dupe.legal_accepted),
               qrCode: dupe.qr_code ?? undefined,
               registrationId: dupe.id,
+              referralCode: dupe.referral_code ?? undefined,
             });
             toast.success('Registro ya existente. Continuando…');
             setStep('staircase');
@@ -133,6 +146,8 @@ export const RegistrationForm = () => {
         legalAccepted: data.legalAccepted,
         qrCode: qrData,
         registrationId: registration.id,
+        referralCode: registration.referral_code ?? undefined,
+        referredBy: referredByCode ?? undefined,
       });
 
       toast.success('¡Registro inicial completado!');

@@ -21,6 +21,8 @@ export interface RegistrationData {
   registrationId?: string;
   voteSelfieUrl?: string;
   passportLevel?: PassportLevel;
+  referralCode?: string;
+  referredBy?: string;
 }
 
 interface RegistrationState {

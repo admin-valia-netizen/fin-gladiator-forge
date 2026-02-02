@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useRegistration } from '@/hooks/useRegistration';
 import { useAuth } from '@/hooks/useAuth';
 import { BotinExplanation } from '@/components/BotinExplanation';
-
+import { ReferralSystem } from '@/components/ReferralSystem';
 const benefits = [
   { id: 1, title: 'Capital Semilla', icon: <Gift className="w-5 h-5" />, locked: true },
   { id: 2, title: 'Becas Tecnológicas', icon: <Code className="w-5 h-5" />, locked: true },
@@ -176,6 +176,19 @@ export const BronzePassport = () => {
           <p className="text-sm text-amber-500 font-semibold mt-3">
             ¡Desbloquea tu Pasaporte Dorado y accede al Botín si ganamos!
           </p>
+        </motion.div>
+
+        {/* Referral System */}
+        <motion.div
+          className="w-full mt-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.55 }}
+        >
+          <ReferralSystem 
+            referralCode={data.referralCode} 
+            registrationId={data.registrationId} 
+          />
         </motion.div>
 
         {/* Botin explanation button */}
