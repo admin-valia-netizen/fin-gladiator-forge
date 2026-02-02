@@ -177,6 +177,9 @@ export const RegistrationForm = () => {
         transition={{ delay: 0.2 }}
       >
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          {/* Ensure non-native inputs are registered with react-hook-form */}
+          <input type="hidden" {...register('legalAccepted')} />
+
           {/* Full Name */}
           <div className="space-y-2">
             <Label htmlFor="fullName" className="flex items-center gap-2 text-foreground">
@@ -241,7 +244,12 @@ export const RegistrationForm = () => {
               <Checkbox
                 id="legalAccepted"
                 checked={legalAccepted}
-                onCheckedChange={(checked) => setValue('legalAccepted', checked as boolean)}
+                onCheckedChange={(checked) =>
+                  setValue('legalAccepted', checked === true, {
+                    shouldDirty: true,
+                    shouldValidate: true,
+                  })
+                }
                 className="mt-1 border-bronze data-[state=checked]:bg-primary data-[state=checked]:border-primary"
               />
               <Label 
