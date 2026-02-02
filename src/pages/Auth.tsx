@@ -26,9 +26,9 @@ const Auth = () => {
   const navigate = useNavigate();
   const { currentStep } = useRegistration();
 
-  // Redirect to splash/onboarding if user hasn't completed them
+  // Redirect to splash/onboarding/welcome if user hasn't completed them
   useEffect(() => {
-    if (currentStep === 'splash' || currentStep === 'onboarding') {
+    if (currentStep === 'splash' || currentStep === 'onboarding' || currentStep === 'welcome') {
       navigate('/', { replace: true });
     }
   }, [currentStep, navigate]);
@@ -49,20 +49,20 @@ const Auth = () => {
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        if (session?.user) {
-          navigate('/');
+        if (session?.user && currentStep === 'registration') {
+          navigate('/', { replace: true });
         }
       }
     );
 
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        navigate('/');
+      if (session?.user && currentStep === 'registration') {
+        navigate('/', { replace: true });
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, [navigate, currentStep]);
 
   const onSubmit = async (data: AuthFormData) => {
     setIsSubmitting(true);
