@@ -67,6 +67,8 @@ export const RegistrationForm = () => {
           return;
         }
 
+        // Generate referral code locally as FIN-{cedula}
+        const generatedReferralCode = `FIN-${existing.cedula}`;
         updateData({
           fullName: existing.full_name,
           cedula: existing.cedula,
@@ -74,7 +76,7 @@ export const RegistrationForm = () => {
           legalAccepted: Boolean(existing.legal_accepted),
           qrCode: existing.qr_code ?? undefined,
           registrationId: existing.id,
-          referralCode: existing.referral_code ?? undefined,
+          referralCode: generatedReferralCode,
         });
 
         toast.success('Encontramos tu registro. Continuando…');
@@ -117,6 +119,8 @@ export const RegistrationForm = () => {
           if (dupeError) throw dupeError;
 
           if (dupe && dupe.phone === data.phone) {
+            // Generate referral code locally as FIN-{cedula}
+            const generatedReferralCode = `FIN-${dupe.cedula}`;
             updateData({
               fullName: dupe.full_name,
               cedula: dupe.cedula,
@@ -124,7 +128,7 @@ export const RegistrationForm = () => {
               legalAccepted: Boolean(dupe.legal_accepted),
               qrCode: dupe.qr_code ?? undefined,
               registrationId: dupe.id,
-              referralCode: dupe.referral_code ?? undefined,
+              referralCode: generatedReferralCode,
             });
             toast.success('Registro ya existente. Continuando…');
             setStep('staircase');
@@ -138,7 +142,8 @@ export const RegistrationForm = () => {
         throw error;
       }
 
-      // Update local state
+      // Update local state - generate referral code locally as FIN-{cedula}
+      const generatedReferralCode = `FIN-${data.cedula}`;
       updateData({
         fullName: data.fullName,
         cedula: data.cedula,
@@ -146,7 +151,7 @@ export const RegistrationForm = () => {
         legalAccepted: data.legalAccepted,
         qrCode: qrData,
         registrationId: registration.id,
-        referralCode: registration.referral_code ?? undefined,
+        referralCode: generatedReferralCode,
         referredBy: referredByCode ?? undefined,
       });
 
