@@ -3,13 +3,15 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Mail, Lock, Shield, ArrowRight, UserPlus, LogIn } from 'lucide-react';
+import { Mail, Lock, ArrowRight, UserPlus, LogIn } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+import { useRegistration } from '@/hooks/useRegistration';
+import finLogo from '@/assets/fin-logo.png';
 
 const authSchema = z.object({
   email: z.string().email('Correo electrónico inválido'),
@@ -22,6 +24,14 @@ const Auth = () => {
   const [isSignUp, setIsSignUp] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
+  const { currentStep } = useRegistration();
+
+  // Redirect to splash/onboarding if user hasn't completed them
+  useEffect(() => {
+    if (currentStep === 'splash' || currentStep === 'onboarding') {
+      navigate('/', { replace: true });
+    }
+  }, [currentStep, navigate]);
 
   const {
     register,
@@ -135,19 +145,17 @@ const Auth = () => {
         ))}
       </div>
 
-      {/* Header */}
+      {/* Header with Logo */}
       <motion.header
-        className="relative z-10 px-6 py-8"
+        className="relative z-10 px-6 py-8 flex justify-center"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <div className="flex items-center gap-3">
-          <Shield className="w-10 h-10 text-primary" />
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">FIN</h1>
-            <p className="text-sm text-muted-foreground">Registro de Integridad</p>
-          </div>
-        </div>
+        <img 
+          src={finLogo} 
+          alt="FIN - Frente de Integridad Nacional" 
+          className="w-32 h-32 object-contain"
+        />
       </motion.header>
 
       {/* Content */}
