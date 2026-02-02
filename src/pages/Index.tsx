@@ -1,5 +1,6 @@
 import { useRegistration } from '@/hooks/useRegistration';
 import { useAuth } from '@/hooks/useAuth';
+import { SplashScreen } from '@/components/SplashScreen';
 import { OnboardingSlides } from '@/components/OnboardingSlides';
 import { WelcomeVideo } from '@/components/WelcomeVideo';
 import { RegistrationForm } from '@/components/RegistrationForm';
@@ -9,11 +10,11 @@ import { Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
 const Index = () => {
-  const { currentStep } = useRegistration();
+  const { currentStep, setStep } = useRegistration();
   const { isAuthenticated, loading } = useAuth();
 
-  // Show loading state only after onboarding
-  if (loading && currentStep !== 'onboarding') {
+  // Show loading state only after splash and onboarding
+  if (loading && currentStep !== 'splash' && currentStep !== 'onboarding') {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="absolute inset-0 bg-gradient-carbon" />
@@ -26,7 +27,12 @@ const Index = () => {
     );
   }
 
-  // Show onboarding first (before auth)
+  // Show splash screen first (before everything)
+  if (currentStep === 'splash') {
+    return <SplashScreen onComplete={() => setStep('onboarding')} />;
+  }
+
+  // Show onboarding second (before auth)
   if (currentStep === 'onboarding') {
     return <OnboardingSlides />;
   }

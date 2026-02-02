@@ -21,7 +21,7 @@ export interface RegistrationData {
 }
 
 interface RegistrationState {
-  currentStep: 'onboarding' | 'welcome' | 'registration' | 'staircase' | 'passport';
+  currentStep: 'splash' | 'onboarding' | 'welcome' | 'registration' | 'staircase' | 'passport';
   staircaseStep: number;
   data: RegistrationData;
   setStep: (step: RegistrationState['currentStep']) => void;
@@ -43,7 +43,7 @@ const initialData: RegistrationData = {
 export const useRegistration = create<RegistrationState>()(
   persist(
     (set) => ({
-      currentStep: 'onboarding',
+      currentStep: 'splash',
       staircaseStep: 1,
       data: initialData,
       setStep: (step) => set({ currentStep: step }),
@@ -54,7 +54,7 @@ export const useRegistration = create<RegistrationState>()(
         })),
       resetDemo: () =>
         set({
-          currentStep: 'onboarding',
+          currentStep: 'splash',
           staircaseStep: 1,
           data: initialData,
         }),
