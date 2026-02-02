@@ -7,6 +7,8 @@ import { WelcomeVideo } from '@/components/WelcomeVideo';
 import { RegistrationForm } from '@/components/RegistrationForm';
 import { BronzeStaircase } from '@/components/BronzeStaircase';
 import { BronzePassport } from '@/components/BronzePassport';
+import { VoteValidationStep } from '@/components/VoteValidationStep';
+import { GoldenPassport } from '@/components/GoldenPassport';
 import { Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
@@ -21,7 +23,7 @@ const Index = () => {
       try {
         const parsed = JSON.parse(stored);
         // If currentStep is not in the valid steps, reset to splash
-        const validSteps = ['splash', 'welcome', 'onboarding', 'registration', 'staircase', 'passport'];
+        const validSteps = ['splash', 'welcome', 'onboarding', 'registration', 'staircase', 'passport', 'vote-validation', 'golden-passport'];
         if (!validSteps.includes(parsed?.state?.currentStep)) {
           resetDemo();
         }
@@ -85,6 +87,15 @@ const Index = () => {
         {currentStep === 'registration' && <RegistrationForm />}
         {currentStep === 'staircase' && <BronzeStaircase />}
         {currentStep === 'passport' && <BronzePassport />}
+        {currentStep === 'vote-validation' && (
+          <div className="min-h-screen bg-background flex flex-col">
+            <div className="absolute inset-0 bg-gradient-carbon" />
+            <div className="relative z-10 flex-1 px-6 py-8">
+              <VoteValidationStep onComplete={() => setStep('golden-passport')} />
+            </div>
+          </div>
+        )}
+        {currentStep === 'golden-passport' && <GoldenPassport />}
       </div>
     </>
   );

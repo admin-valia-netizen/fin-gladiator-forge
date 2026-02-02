@@ -3,6 +3,7 @@ import { persist } from 'zustand/middleware';
 
 export type InterestArea = 'emprendimiento' | 'tecnologia' | 'deporte' | 'empleo_tecnico';
 export type UserLevel = 'aspirante' | 'gladiador' | 'campeon';
+export type PassportLevel = 'bronce' | 'dorado';
 
 export interface RegistrationData {
   fullName: string;
@@ -18,10 +19,12 @@ export interface RegistrationData {
   userLevel: UserLevel;
   qrCode?: string;
   registrationId?: string;
+  voteSelfieUrl?: string;
+  passportLevel?: PassportLevel;
 }
 
 interface RegistrationState {
-  currentStep: 'splash' | 'onboarding' | 'welcome' | 'registration' | 'staircase' | 'passport';
+  currentStep: 'splash' | 'onboarding' | 'welcome' | 'registration' | 'staircase' | 'passport' | 'vote-validation' | 'golden-passport';
   staircaseStep: number;
   data: RegistrationData;
   setStep: (step: RegistrationState['currentStep']) => void;

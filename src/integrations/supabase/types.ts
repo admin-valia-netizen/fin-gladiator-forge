@@ -25,12 +25,15 @@ export type Database = {
           interest_area: Database["public"]["Enums"]["interest_area"] | null
           legal_accepted: boolean | null
           oath_accepted: boolean | null
+          passport_level: string | null
           phone: string
           qr_code: string | null
           selfie_url: string | null
           signature_confirmed: boolean | null
           updated_at: string
           user_level: Database["public"]["Enums"]["user_level"] | null
+          vote_selfie_url: string | null
+          vote_validated_at: string | null
         }
         Insert: {
           cedula: string
@@ -42,12 +45,15 @@ export type Database = {
           interest_area?: Database["public"]["Enums"]["interest_area"] | null
           legal_accepted?: boolean | null
           oath_accepted?: boolean | null
+          passport_level?: string | null
           phone: string
           qr_code?: string | null
           selfie_url?: string | null
           signature_confirmed?: boolean | null
           updated_at?: string
           user_level?: Database["public"]["Enums"]["user_level"] | null
+          vote_selfie_url?: string | null
+          vote_validated_at?: string | null
         }
         Update: {
           cedula?: string
@@ -59,12 +65,15 @@ export type Database = {
           interest_area?: Database["public"]["Enums"]["interest_area"] | null
           legal_accepted?: boolean | null
           oath_accepted?: boolean | null
+          passport_level?: string | null
           phone?: string
           qr_code?: string | null
           selfie_url?: string | null
           signature_confirmed?: boolean | null
           updated_at?: string
           user_level?: Database["public"]["Enums"]["user_level"] | null
+          vote_selfie_url?: string | null
+          vote_validated_at?: string | null
         }
         Relationships: []
       }
