@@ -3,7 +3,7 @@ import { useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { User, CreditCard, Phone, CheckSquare, ArrowRight, Shield } from 'lucide-react';
+import { User, CreditCard, Phone, CheckSquare, ArrowRight, Shield, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -172,6 +172,17 @@ export const RegistrationForm = () => {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
       >
+        {/* Back button */}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setStep('onboarding')}
+          className="text-muted-foreground hover:text-foreground mb-4"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Volver al inicio
+        </Button>
+
         <div className="flex items-center gap-3">
           <Shield className="w-8 h-8 text-primary" />
           <div>

@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useState, useRef } from 'react';
-import { Camera, Check, Loader2, Vote, Fingerprint, MapPin, Trophy } from 'lucide-react';
+import { Camera, Check, Loader2, Vote, Fingerprint, MapPin, Trophy, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useRegistration } from '@/hooks/useRegistration';
 import { supabase } from '@/integrations/supabase/client';
@@ -8,13 +8,22 @@ import { toast } from 'sonner';
 
 interface VoteValidationStepProps {
   onComplete: () => void;
+  onBack?: () => void;
 }
 
-export const VoteValidationStep = ({ onComplete }: VoteValidationStepProps) => {
+export const VoteValidationStep = ({ onComplete, onBack }: VoteValidationStepProps) => {
   const [isUploading, setIsUploading] = useState(false);
   const [voteSelfieUrl, setVoteSelfieUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { data, updateData } = useRegistration();
+  const { data, updateData, setStep } = useRegistration();
+
+  const handleBack = () => {
+    if (onBack) {
+      onBack();
+    } else {
+      setStep('passport');
+    }
+  };
 
   const handleCapture = () => {
     fileInputRef.current?.click();
@@ -96,6 +105,23 @@ export const VoteValidationStep = ({ onComplete }: VoteValidationStepProps) => {
         className="hidden"
         onChange={handleFileChange}
       />
+
+      {/* Back button */}
+      <motion.div
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        className="mb-4"
+      >
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handleBack}
+          className="text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Volver al Pasaporte
+        </Button>
+      </motion.div>
 
       {/* Step indicator */}
       <div className="step-bronze step-active p-6 rounded-xl border-2 border-amber-500">

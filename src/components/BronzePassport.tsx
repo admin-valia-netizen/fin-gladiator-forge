@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
-import { Shield, Lock, Gift, Briefcase, Code, Trophy, Wrench, RotateCcw, MapPin, LogOut, Vote } from 'lucide-react';
+import { Shield, Lock, Gift, Briefcase, Code, Trophy, Wrench, RotateCcw, MapPin, LogOut, Vote, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useRegistration } from '@/hooks/useRegistration';
 import { useAuth } from '@/hooks/useAuth';
@@ -40,6 +40,10 @@ export const BronzePassport = () => {
     setStep('vote-validation');
   };
 
+  const handleBack = () => {
+    setStep('staircase');
+  };
+
   return (
     <div className="min-h-screen bg-background flex flex-col p-6">
       {/* Background */}
@@ -52,6 +56,23 @@ export const BronzePassport = () => {
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5 }}
       >
+        {/* Back button */}
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="self-start mb-4"
+        >
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleBack}
+            className="text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Volver a la Escalera
+          </Button>
+        </motion.div>
+
         {/* Success message */}
         <motion.div
           className="text-center mb-8"
