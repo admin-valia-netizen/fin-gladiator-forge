@@ -17,7 +17,9 @@ export default defineConfig(({ mode }) => ({
     react(),
     mode === "development" && componentTagger(),
     VitePWA({
-      registerType: "autoUpdate",
+      // Use prompt mode so the app can show an in-app "update available" notice
+      // (this triggers registerSW({ onNeedRefresh }))
+      registerType: "prompt",
       includeAssets: ["favicon.ico", "robots.txt", "fin-logo.png"],
       manifest: {
         name: "FIN - Frente de Integridad Nacional",
@@ -49,9 +51,6 @@ export default defineConfig(({ mode }) => ({
         ],
       },
       workbox: {
-        // Make updates take effect faster in installed PWAs
-        skipWaiting: true,
-        clientsClaim: true,
         globPatterns: ["**/*.{js,css,html,ico,png,svg,jpg,jpeg,webp}"],
         // Exclude large media files from precaching - they'll be fetched on demand
         globIgnores: ["**/*.mp4", "**/*.mp3"],
