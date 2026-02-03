@@ -98,7 +98,7 @@ export const WelcomeVideo = () => {
           </div>
 
           <motion.button
-            onClick={() => setStep('onboarding')}
+            onClick={() => setStep('motto')}
             className="group relative px-10 py-4 bg-gradient-neon rounded-xl font-bold text-lg uppercase tracking-widest text-primary-foreground shadow-neon-strong overflow-hidden"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}

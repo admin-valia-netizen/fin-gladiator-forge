@@ -26,7 +26,7 @@ export interface RegistrationData {
 }
 
 interface RegistrationState {
-  currentStep: 'splash' | 'onboarding' | 'welcome' | 'registration' | 'staircase' | 'passport' | 'vote-validation' | 'golden-passport';
+  currentStep: 'splash' | 'welcome' | 'motto' | 'glossary' | 'onboarding' | 'registration' | 'staircase' | 'passport' | 'vote-validation' | 'golden-passport';
   staircaseStep: number;
   data: RegistrationData;
   setStep: (step: RegistrationState['currentStep']) => void;

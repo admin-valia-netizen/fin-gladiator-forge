@@ -4,6 +4,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { SplashScreen } from '@/components/SplashScreen';
 import { OnboardingSlides } from '@/components/OnboardingSlides';
 import { WelcomeVideo } from '@/components/WelcomeVideo';
+import { MottoScreen } from '@/components/MottoScreen';
+import { GlossaryScreen } from '@/components/GlossaryScreen';
 import { RegistrationForm } from '@/components/RegistrationForm';
 import { BronzeStaircase } from '@/components/BronzeStaircase';
 import { BronzePassport } from '@/components/BronzePassport';
@@ -23,7 +25,7 @@ const Index = () => {
       try {
         const parsed = JSON.parse(stored);
         // If currentStep is not in the valid steps, reset to splash
-        const validSteps = ['splash', 'welcome', 'onboarding', 'registration', 'staircase', 'passport', 'vote-validation', 'golden-passport'];
+        const validSteps = ['splash', 'welcome', 'motto', 'glossary', 'onboarding', 'registration', 'staircase', 'passport', 'vote-validation', 'golden-passport'];
         if (!validSteps.includes(parsed?.state?.currentStep)) {
           resetDemo();
         }
@@ -33,8 +35,9 @@ const Index = () => {
     }
   }, [resetDemo]);
 
-  // Show loading state only after splash and onboarding
-  if (loading && currentStep !== 'splash' && currentStep !== 'onboarding') {
+  // Show loading state only after intro sequence
+  const introSteps = ['splash', 'welcome', 'motto', 'glossary', 'onboarding'];
+  if (loading && !introSteps.includes(currentStep)) {
     return (
       <>
         <div className="min-h-screen bg-background flex items-center justify-center">
@@ -49,31 +52,29 @@ const Index = () => {
     );
   }
 
-  // Show splash screen first (before everything)
+  // 1. Splash Screen - Logo de FIN
   if (currentStep === 'splash') {
-    return (
-      <>
-        <SplashScreen onComplete={() => setStep('welcome')} />
-      </>
-    );
+    return <SplashScreen onComplete={() => setStep('welcome')} />;
   }
 
-  // Show welcome video second (after splash, before onboarding)
+  // 2. Video de Impacto - Gladiador golpeando escudo
   if (currentStep === 'welcome') {
-    return (
-      <>
-        <WelcomeVideo />
-      </>
-    );
+    return <WelcomeVideo />;
   }
 
-  // Show onboarding third (before auth)
+  // 3. El Estandarte (Lema) - ORDEN. MORALIDAD. CONFIANZA.
+  if (currentStep === 'motto') {
+    return <MottoScreen />;
+  }
+
+  // 4. Glosario "Entiende tu Poder"
+  if (currentStep === 'glossary') {
+    return <GlossaryScreen />;
+  }
+
+  // 5. Onboarding (Manifiesto) - 3 láminas
   if (currentStep === 'onboarding') {
-    return (
-      <>
-        <OnboardingSlides />
-      </>
-    );
+    return <OnboardingSlides />;
   }
 
   // After onboarding, require auth for all other steps
