@@ -49,6 +49,9 @@ export default defineConfig(({ mode }) => ({
         ],
       },
       workbox: {
+        // Make updates take effect faster in installed PWAs
+        skipWaiting: true,
+        clientsClaim: true,
         globPatterns: ["**/*.{js,css,html,ico,png,svg,jpg,jpeg,webp}"],
         // Exclude large media files from precaching - they'll be fetched on demand
         globIgnores: ["**/*.mp4", "**/*.mp3"],
