@@ -30,7 +30,7 @@ const slides: Slide[] = [
   {
     id: 3,
     title: "LA FIRMA QUE CAMBIA TODO",
-    subtitle: "Para que la JCE oficialice nuestro partido, necesitamos tu firma en papel. Esta app es el primer paso: Regístrate digitalmente para validar tu integridad. Ubica tu Mesa de Forja más cercana en el mapa. Firma físicamente para sellar tu compromiso y activar tu acceso al Botín del Gladiador. ¡Tu firma física es el anclaje legal de tu futuro!",
+    subtitle: "Para que la JCE oficialice nuestro partido, necesitamos tu firma en papel. Esta app es el primer paso: Regístrate digitalmente para validar tu integridad. Ubica tu Mesa de Forja más cercana en el mapa. Firma físicamente para sellar tu compromiso y activar tu acceso a la Recompensa del Gladiador. ¡Tu firma física es el anclaje legal de tu futuro!",
     image: onboarding3,
   },
 ];

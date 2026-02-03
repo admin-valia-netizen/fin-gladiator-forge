@@ -163,7 +163,7 @@ export const VoteValidationStep = ({ onComplete, onBack }: VoteValidationStepPro
           <div>
             <p className="font-bold text-foreground">Pasaporte Dorado</p>
             <p className="text-sm text-muted-foreground">
-              Al validar desbloqueas tu Pasaporte Dorado y acceso al Botín si ganamos
+              Al validar desbloqueas tu Pasaporte Dorado y acceso a la Recompensa si ganamos
             </p>
           </div>
         </div>

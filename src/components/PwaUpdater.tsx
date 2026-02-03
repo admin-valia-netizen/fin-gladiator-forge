@@ -10,8 +10,23 @@ export const PwaUpdater = () => {
   const didPrompt = useRef(false);
 
   useEffect(() => {
+    let intervalId: number | undefined;
+
     const updateSW = registerSW({
       immediate: true,
+      onRegisteredSW(_swUrl, registration) {
+        if (!registration) return;
+
+        // Force an early update check (Android/installed PWAs sometimes delay it)
+        window.setTimeout(() => {
+          registration.update().catch(() => {});
+        }, 2000);
+
+        // Periodic update checks so the "Hay una actualización disponible" aviso appears reliably
+        intervalId = window.setInterval(() => {
+          registration.update().catch(() => {});
+        }, 15 * 60 * 1000);
+      },
       onNeedRefresh() {
         if (didPrompt.current) return;
         didPrompt.current = true;
@@ -29,6 +44,10 @@ export const PwaUpdater = () => {
         });
       },
     });
+
+    return () => {
+      if (intervalId) window.clearInterval(intervalId);
+    };
   }, []);
 
   return null;
