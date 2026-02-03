@@ -4,8 +4,8 @@ import { Shield, Lock, Gift, Briefcase, Code, Trophy, Wrench, RotateCcw, MapPin,
 import { Button } from '@/components/ui/button';
 import { useRegistration } from '@/hooks/useRegistration';
 import { useAuth } from '@/hooks/useAuth';
-import { BotinExplanation } from '@/components/BotinExplanation';
 import { ReferralSystem } from '@/components/ReferralSystem';
+import { FinTablesMapCard } from '@/components/FinTablesMapCard';
 const benefits = [
   { id: 1, title: 'Capital Semilla', icon: <Gift className="w-5 h-5" />, locked: true },
   { id: 2, title: 'Becas Tecnológicas', icon: <Code className="w-5 h-5" />, locked: true },
@@ -199,14 +199,14 @@ export const BronzePassport = () => {
           </p>
         </motion.div>
 
-        {/* Botin Explanation Button */}
+        {/* Map of FIN tables for signature (va aquí, en lugar del botón del Botín) */}
         <motion.div
           className="w-full mt-6"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.52 }}
         >
-          <BotinExplanation />
+          <FinTablesMapCard />
         </motion.div>
 
         {/* Referral System */}
