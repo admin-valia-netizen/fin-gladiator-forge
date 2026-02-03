@@ -20,7 +20,7 @@ const rewards = [
   {
     icon: <GraduationCap className="w-8 h-8" />,
     title: 'EDUCACIÓN',
-    description: 'Becas en Academias tecnológicas, Astillero GESEMA, ENIAR (Escuela Náutica Internacional de Alto Rendimiento), Masters que apliquen y Universidades Privadas.',
+    description: 'Becas en Academias tecnológicas en Astillero GESEMA en ENIAR (Escuela Náutica Internacional de Alto Rendimiento). Masters Que apliquen y Universidades Privadas.',
     color: 'text-blue-400',
     bgColor: 'bg-blue-400/10',
   },

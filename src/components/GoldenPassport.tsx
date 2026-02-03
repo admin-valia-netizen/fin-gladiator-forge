@@ -115,7 +115,7 @@ export const GoldenPassport = () => {
           <h1 className="text-2xl font-bold text-foreground mb-2">
             ¡Felicidades, <span className="text-amber-500">Campeón!</span>
           </h1>
-          <p className="text-muted-foreground">Has validado tu voto. Tu Botín está listo.</p>
+          <p className="text-muted-foreground">Has validado tu voto. Tu Recompensa está lista.</p>
         </motion.div>
 
         {/* Golden Passport card */}
@@ -200,7 +200,7 @@ export const GoldenPassport = () => {
         >
           <h2 className="text-center font-bold text-foreground flex items-center justify-center gap-2">
             <Sparkles className="w-4 h-4 text-amber-500" />
-            Tu Botín Desbloqueado
+            Tu Recompensa Desbloqueada
           </h2>
 
           <div className="grid grid-cols-2 gap-3">
@@ -239,7 +239,7 @@ export const GoldenPassport = () => {
             ¡Ya estás listo!
           </h3>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            Tu Botín de Gladiador está <span className="text-amber-500 font-semibold">desbloqueado y listo para reclamar</span>.
+            Tu Recompensa de Gladiador está <span className="text-amber-500 font-semibold">desbloqueada y lista para reclamar</span>.
           </p>
           <p className="text-sm text-amber-500 font-semibold mt-3">
             Si ganamos las elecciones, podrás acceder a todos tus beneficios. ¡Gracias por ser parte del cambio!

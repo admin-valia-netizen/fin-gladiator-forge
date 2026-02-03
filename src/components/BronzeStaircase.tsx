@@ -36,7 +36,7 @@ const steps: Step[] = [
   },
   {
     id: 4,
-    title: 'El Botín y El Anclaje',
+    title: 'La Recompensa y el Anclaje',
     description: 'Elige tu área y confirma',
     icon: <MapPin className="w-6 h-6" />,
   },
@@ -467,7 +467,7 @@ const EvidenceStep = ({ onComplete }: { onComplete: () => void }) => {
   );
 };
 
-// Peldaño 3: El Botín y El Anclaje
+// Peldaño 3: La Recompensa y el Anclaje
 const ChoiceStep = ({ onComplete }: { onComplete: () => void }) => {
   const [selectedArea, setSelectedArea] = useState<string | null>(null);
   const { data, updateData } = useRegistration();
@@ -510,7 +510,7 @@ const ChoiceStep = ({ onComplete }: { onComplete: () => void }) => {
             <MapPin className="w-5 h-5 text-primary" />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-foreground">Peldaño 3: El Botín</h2>
+            <h2 className="text-lg font-bold text-foreground">Peldaño 3: La Recompensa</h2>
             <p className="text-sm text-muted-foreground">Elige tu área de interés</p>
           </div>
         </div>
@@ -541,7 +541,7 @@ const ChoiceStep = ({ onComplete }: { onComplete: () => void }) => {
       <div className="card-industrial p-4 rounded-xl border-l-4 border-primary">
         <p className="text-sm text-muted-foreground">
           <span className="font-bold text-primary">⚠️ El Mensaje:</span> Tu firma física es la llave. 
-          Sin firma en papel, no hay botín.
+          Sin firma en papel, no hay recompensa.
         </p>
       </div>
 

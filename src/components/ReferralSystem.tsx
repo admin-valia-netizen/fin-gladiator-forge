@@ -227,7 +227,7 @@ export const ReferralSystem = ({ referralCode, registrationId }: ReferralSystemP
               {isComplete ? (
                 <span className="text-green-500 flex items-center justify-center gap-1">
                   <Crown className="w-3 h-3" />
-                  ¡Meta cumplida! Tu grupo está listo para el Botín
+                  ¡Meta cumplida! Tu grupo está listo para la Recompensa
                 </span>
               ) : (
                 `Faltan ${REQUIRED_REFERRALS - completedReferrals} gladiadores para completar tu grupo`
@@ -245,7 +245,7 @@ export const ReferralSystem = ({ referralCode, registrationId }: ReferralSystemP
             <div className="flex items-start gap-2">
               <AlertTriangle className="w-4 h-4 text-destructive shrink-0 mt-0.5" />
               <p className="text-xs text-muted-foreground">
-                <span className="text-destructive font-bold">Recuerda:</span> Todos tus referidos deben completar la Escalera de Bronce para que el grupo reciba el Botín.
+                <span className="text-destructive font-bold">Recuerda:</span> Todos tus referidos deben completar la Escalera de Bronce para que el grupo reciba la Recompensa.
               </p>
             </div>
           </motion.div>

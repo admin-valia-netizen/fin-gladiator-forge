@@ -195,7 +195,7 @@ export const BronzePassport = () => {
             3. Después de votar, regresa aquí y presiona <span className="text-amber-500 font-semibold">"YA VOTÉ"</span> para subir tu selfie con el dedo entintado.
           </p>
           <p className="text-sm text-amber-500 font-semibold mt-3">
-            ¡Desbloquea tu Pasaporte Dorado y accede al Botín si ganamos!
+            ¡Desbloquea tu Pasaporte Dorado y accede a la Recompensa si ganamos!
           </p>
         </motion.div>
 
@@ -232,7 +232,7 @@ export const BronzePassport = () => {
         >
           <h2 className="text-center font-bold text-foreground flex items-center justify-center gap-2">
             <Lock className="w-4 h-4 text-muted-foreground" />
-            Tu Botín (Bloqueado)
+            Tu Recompensa (Bloqueada)
           </h2>
 
           <div className="grid grid-cols-2 gap-3">
