@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Coins, Laptop, Anchor, ShieldPlus, FileSignature, Vote, Camera, Users, AlertTriangle } from 'lucide-react';
+import { Coins, GraduationCap, Anchor, ShieldPlus, FileSignature, Vote, Camera, Users, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -18,9 +18,9 @@ const rewards = [
     bgColor: 'bg-yellow-500/10',
   },
   {
-    icon: <Laptop className="w-8 h-8" />,
-    title: 'CONECTIVIDAD TOTAL',
-    description: 'Laptop de alta gama, internet gratuito y becas en las mejores academias tecnológicas. Para que compitas con el mundo.',
+    icon: <GraduationCap className="w-8 h-8" />,
+    title: 'EDUCACIÓN',
+    description: 'Becas en Academias tecnológicas, Astillero GESEMA, ENIAR (Escuela Náutica Internacional de Alto Rendimiento), Masters que apliquen y Universidades Privadas.',
     color: 'text-blue-400',
     bgColor: 'bg-blue-400/10',
   },
@@ -70,14 +70,14 @@ export const BotinExplanation = () => {
       <DialogTrigger asChild>
         <Button variant="neon" size="lg" className="w-full">
           <Coins className="w-5 h-5 mr-2" />
-          ¿Qué es el Botín?
+          ¿Qué es la Recompensa?
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-lg w-[calc(100%-2rem)] max-h-[90vh] overflow-y-auto bg-background border-bronze/30">
         <DialogHeader>
           <DialogTitle className="text-center">
             <span className="text-2xl font-bold bg-gradient-bronze bg-clip-text text-transparent">
-              EL BOTÍN DEL GLADIADOR
+              LA RECOMPENSA DEL GLADIADOR
             </span>
           </DialogTitle>
         </DialogHeader>
@@ -142,7 +142,7 @@ export const BotinExplanation = () => {
           >
             <div className="text-center">
               <p className="text-sm font-bold text-primary uppercase tracking-wider">
-                ¿Cómo Reclamar Tu Botín?
+                ¿Cómo Reclamar Tu Recompensa?
               </p>
               <p className="text-xs text-muted-foreground mt-1">
                 Es un pacto de integridad en cuatro pasos:
@@ -194,10 +194,10 @@ export const BotinExplanation = () => {
                   </h5>
                   <p className="text-xs text-foreground leading-relaxed">
                     Si <span className="font-bold text-destructive">todos tus 50 referidos</span> completan la 
-                    Escalera de Bronce, <span className="font-bold text-primary">TODOS reciben su Botín</span>.
+                    Escalera de Bronce, <span className="font-bold text-primary">TODOS reciben su Recompensa</span>.
                   </p>
                   <p className="text-xs text-destructive font-bold mt-2">
-                    Pero si 1 SOLO falla... ¡NADIE recibe el Botín!
+                    Pero si 1 SOLO falla... ¡NADIE recibe la Recompensa!
                   </p>
                   <p className="text-xs text-muted-foreground mt-2">
                     Elige bien a tus Gladiadores. Tu éxito depende del compromiso de todos.
@@ -217,7 +217,7 @@ export const BotinExplanation = () => {
             <p className="text-sm text-foreground font-medium leading-relaxed">
               Al validar tu participación, tu <span className="font-bold">Pasaporte de Bronce</span> se 
               vuelve <span className="font-bold text-yellow-300">Oro</span> y se activa automáticamente 
-              tu acceso al botín que elegiste.
+              tu acceso a la recompensa que elegiste.
             </p>
           </motion.div>
 
