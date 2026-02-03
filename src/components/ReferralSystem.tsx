@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Users, Share2, Copy, Check, Crown, AlertTriangle, X, Loader2 } from 'lucide-react';
+import { Users, Share2, Copy, Check, Crown, AlertTriangle, Loader2, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -146,6 +146,29 @@ export const ReferralSystem = ({ referralCode, registrationId }: ReferralSystemP
     }
   };
 
+  const handleWhatsAppShare = () => {
+    if (!userReferralCode) {
+      toast.error('No hay código de referido disponible');
+      return;
+    }
+
+    const shareUrl = `https://fin-gladiator-forge.lovable.app?ref=${userReferralCode}`;
+    const message = `¡Únete a mi legión en FIN (Frente de Integridad Nacional)! 🛡️
+
+¿No sabes qué es? Es el nuevo movimiento que viene a eliminar las "cuñas" y a darnos oportunidades por nuestro propio mérito.
+
+Estoy forjando mi futuro y necesito a 50 Gladiadores de integridad. Si todos firmamos físicamente en la Mesa de Forja, desbloqueamos el Botín: capital para emprendimientos, becas y empleos de verdad. 🔨🔥
+
+En FIN mandan el Orden, la Moralidad y la Confianza.
+
+Regístrate aquí, entra en mi equipo y forja tu destino: ${shareUrl}
+
+¡Si uno falla, nadie gana. Es ahora o nunca!`;
+
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+  };
+
   const completedReferrals = referrals.filter(r => r.passport_level === 'bronce' || r.passport_level === 'dorado').length;
   const progress = (completedReferrals / REQUIRED_REFERRALS) * 100;
   const isComplete = completedReferrals >= REQUIRED_REFERRALS;
@@ -199,14 +222,23 @@ export const ReferralSystem = ({ referralCode, registrationId }: ReferralSystemP
             </div>
           </motion.div>
 
-          {/* Share Button */}
+          {/* WhatsApp Share Button - Primary CTA */}
+          <Button
+            onClick={handleWhatsAppShare}
+            className="w-full bg-[#25D366] hover:bg-[#1fb855] text-white font-bold shadow-[0_0_15px_rgba(37,211,102,0.3)] hover:shadow-[0_0_25px_rgba(37,211,102,0.5)] border border-[#1fb855]/50"
+          >
+            <MessageCircle className="w-5 h-5 mr-2" />
+            Reclutar en WhatsApp
+          </Button>
+
+          {/* General Share Button */}
           <Button
             onClick={handleShare}
-            variant="neon"
-            className="w-full"
+            variant="outline"
+            className="w-full border-primary/30"
           >
             <Share2 className="w-4 h-4 mr-2" />
-            Compartir Código
+            Compartir de otra forma
           </Button>
 
           {/* Progress Section */}
