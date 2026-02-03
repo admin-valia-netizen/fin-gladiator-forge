@@ -157,7 +157,7 @@ export const ReferralSystem = ({ referralCode, registrationId }: ReferralSystemP
 
 ¿No sabes qué es? Es el nuevo movimiento que viene a eliminar las "cuñas" y a darnos oportunidades por nuestro propio mérito.
 
-Estoy forjando mi futuro y necesito a 50 Gladiadores de integridad. Si todos firmamos físicamente en la Mesa de Forja, desbloqueamos el Botín: capital para emprendimientos, becas y empleos de verdad. 🔨🔥
+Estoy forjando mi futuro y necesito a 50 Gladiadores de integridad. Si todos firmamos físicamente en la Mesa de Forja, desbloqueamos la Recompensa: capital para emprendimientos, becas y empleos de verdad. 🔨🔥
 
 En FIN mandan el Orden, la Moralidad y la Confianza.
 
