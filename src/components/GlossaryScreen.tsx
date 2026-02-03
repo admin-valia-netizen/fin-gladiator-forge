@@ -36,7 +36,7 @@ export const GlossaryScreen = () => {
   return (
     <div className="fixed inset-0 bg-background flex flex-col overflow-hidden">
       {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-carbon" />
+      <div className="absolute inset-0 bg-gradient-carbon pointer-events-none" />
       
       {/* Header */}
       <motion.div
@@ -110,7 +110,7 @@ export const GlossaryScreen = () => {
 
       {/* Bottom button */}
       <motion.div
-        className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-background via-background to-transparent"
+        className="absolute bottom-0 left-0 right-0 z-20 p-6 bg-gradient-to-t from-background via-background to-transparent"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
@@ -141,7 +141,7 @@ export const GlossaryScreen = () => {
       </motion.div>
 
       {/* Progress indicator */}
-      <div className="absolute bottom-24 left-0 right-0 flex justify-center gap-2">
+      <div className="absolute bottom-24 left-0 right-0 z-20 flex justify-center gap-2 pointer-events-none">
         {glossaryItems.map((_, index) => (
           <motion.div
             key={index}
