@@ -61,13 +61,23 @@ export const VoteValidationStep = ({ onComplete, onBack }: VoteValidationStepPro
     setDateWarning(false);
     
     try {
+      // Get current authenticated user for secure file path
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      
+      if (userError || !user) {
+        toast.error('Debes iniciar sesión para subir archivos.');
+        setIsUploading(false);
+        return;
+      }
+
       // Validate election date
       await validateElectionDate(file);
       
       const fileExt = file.name.split('.').pop();
       const timestamp = Date.now();
       const today = new Date().toISOString().split('T')[0];
-      const fileName = `${data.cedula}/vote-selfie-${today}-${timestamp}.${fileExt}`;
+      // Use user_id in file path for RLS compliance
+      const fileName = `${user.id}/vote-selfie-${today}-${timestamp}.${fileExt}`;
       
       const { error: uploadError } = await supabase.storage
         .from('evidencias')
@@ -75,19 +85,22 @@ export const VoteValidationStep = ({ onComplete, onBack }: VoteValidationStepPro
 
       if (uploadError) throw uploadError;
 
-      const { data: urlData } = supabase.storage
+      // Create signed URL for secure access
+      const { data: signedUrlData, error: signedError } = await supabase.storage
         .from('evidencias')
-        .getPublicUrl(fileName);
+        .createSignedUrl(fileName, 3600);
 
-      const url = urlData.publicUrl;
+      if (signedError) throw signedError;
+
+      const url = signedUrlData.signedUrl;
       setVoteSelfieUrl(url);
       
-      // Update in database with validation timestamp
+      // Update in database with file path (not signed URL)
       if (data.registrationId) {
         await supabase
           .from('registrations')
           .update({ 
-            vote_selfie_url: url,
+            vote_selfie_url: fileName,
             vote_validated_at: new Date().toISOString(),
             passport_level: 'dorado',
             user_level: 'campeon'

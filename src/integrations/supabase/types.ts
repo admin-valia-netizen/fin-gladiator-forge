@@ -84,6 +84,7 @@ export type Database = {
           selfie_url: string | null
           signature_confirmed: boolean | null
           updated_at: string
+          user_id: string | null
           user_level: Database["public"]["Enums"]["user_level"] | null
           vote_selfie_url: string | null
           vote_validated_at: string | null
@@ -107,6 +108,7 @@ export type Database = {
           selfie_url?: string | null
           signature_confirmed?: boolean | null
           updated_at?: string
+          user_id?: string | null
           user_level?: Database["public"]["Enums"]["user_level"] | null
           vote_selfie_url?: string | null
           vote_validated_at?: string | null
@@ -130,6 +132,7 @@ export type Database = {
           selfie_url?: string | null
           signature_confirmed?: boolean | null
           updated_at?: string
+          user_id?: string | null
           user_level?: Database["public"]["Enums"]["user_level"] | null
           vote_selfie_url?: string | null
           vote_validated_at?: string | null

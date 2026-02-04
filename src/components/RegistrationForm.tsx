@@ -47,27 +47,29 @@ export const RegistrationForm = () => {
     setIsSubmitting(true);
     
     try {
+      // Get current authenticated user
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      
+      if (userError || !user) {
+        toast.error('Debes iniciar sesión para registrarte.');
+        return;
+      }
+
       // Check if user has a referral code in URL
       const urlParams = new URLSearchParams(window.location.search);
       const referredByCode = urlParams.get('ref');
 
-      // DB-first check: if the user already registered (same cedula), resume instead of blocking.
+      // DB-first check: if the user already registered (by user_id), resume instead of blocking.
       const { data: existing, error: existingError } = await supabase
         .from('registrations')
         .select('id, full_name, cedula, phone, legal_accepted, qr_code, referral_code')
-        .eq('cedula', data.cedula)
+        .eq('user_id', user.id)
         .maybeSingle();
 
       if (existingError) throw existingError;
 
       if (existing) {
-        // Basic protection: require same phone to continue.
-        if (existing.phone !== data.phone) {
-          toast.error('Esta cédula ya está registrada con otro teléfono.');
-          return;
-        }
-
-        // Generate referral code locally as FIN-{cedula}
+        // User already has a registration, resume
         const generatedReferralCode = `FIN-${existing.cedula}`;
         updateData({
           fullName: existing.full_name,
@@ -84,11 +86,24 @@ export const RegistrationForm = () => {
         return;
       }
 
+      // Check if cedula is already used by another user
+      const { data: cedulaCheck } = await supabase
+        .from('registrations')
+        .select('id')
+        .eq('cedula', data.cedula)
+        .maybeSingle();
+
+      if (cedulaCheck) {
+        toast.error('Esta cédula ya está registrada por otro usuario.');
+        return;
+      }
+
       // Generate QR code data
       const qrData = `FIN-${data.cedula}-${Date.now()}`;
       
-      // Save to Supabase (with optional referral)
+      // Save to Supabase with user_id
       const insertData: any = {
+        user_id: user.id,
         full_name: data.fullName,
         cedula: data.cedula,
         phone: data.phone,
@@ -113,13 +128,12 @@ export const RegistrationForm = () => {
           const { data: dupe, error: dupeError } = await supabase
             .from('registrations')
             .select('id, full_name, cedula, phone, legal_accepted, qr_code, referral_code')
-            .eq('cedula', data.cedula)
+            .eq('user_id', user.id)
             .maybeSingle();
 
           if (dupeError) throw dupeError;
 
-          if (dupe && dupe.phone === data.phone) {
-            // Generate referral code locally as FIN-{cedula}
+          if (dupe) {
             const generatedReferralCode = `FIN-${dupe.cedula}`;
             updateData({
               fullName: dupe.full_name,
@@ -135,7 +149,7 @@ export const RegistrationForm = () => {
             return;
           }
 
-          toast.error('Esta cédula ya está registrada');
+          toast.error('Esta cédula ya está registrada por otro usuario');
           return;
         }
 

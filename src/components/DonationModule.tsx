@@ -105,29 +105,33 @@ export const DonationModule = ({ onClose, registrationId }: DonationModuleProps)
     setError(null);
 
     try {
-      // 1. Upload proof image to storage
+      // Get current authenticated user for secure file path
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      
+      if (userError || !user) {
+        setError('Debes iniciar sesión para subir archivos.');
+        setIsSubmitting(false);
+        return;
+      }
+
+      // 1. Upload proof image to storage with user_id path
       const fileExt = proofFile.name.split('.').pop();
-      const fileName = `donation-proof-${registrationId}-${Date.now()}.${fileExt}`;
-      const filePath = `donations/${fileName}`;
+      const fileName = `${user.id}/donation-proof-${Date.now()}.${fileExt}`;
 
       const { error: uploadError } = await supabase.storage
         .from('evidencias')
-        .upload(filePath, proofFile);
+        .upload(fileName, proofFile);
 
       if (uploadError) throw uploadError;
 
-      // 2. Get public URL
-      const { data: urlData } = supabase.storage
-        .from('evidencias')
-        .getPublicUrl(filePath);
-
+      // 2. Store file path (not public URL since bucket is now private)
       // 3. Create donation record
       const { error: insertError } = await supabase
         .from('donations')
         .insert({
           registration_id: registrationId,
           amount: DONATION_AMOUNT,
-          payment_proof_url: urlData.publicUrl,
+          payment_proof_url: fileName,
           cedula_confirmed: cedulaConfirm,
           status: 'pending',
         });
