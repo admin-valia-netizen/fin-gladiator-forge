@@ -139,6 +139,33 @@ export type Database = {
         }
         Relationships: []
       }
+      role_audit_log: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          performed_by: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: string
+          performed_by: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          performed_by?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -165,6 +192,57 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_donations_safe: {
+        Args: { p_donation_id?: string }
+        Returns: {
+          amount: number
+          cedula_confirmed: string
+          created_at: string
+          id: string
+          registration_id: string
+          rejection_reason: string
+          reviewed_at: string
+          reviewed_by: string
+          status: Database["public"]["Enums"]["donation_status"]
+          updated_at: string
+        }[]
+      }
+      get_own_document_urls: {
+        Args: { p_registration_id: string }
+        Returns: {
+          cedula_back_url: string
+          cedula_front_url: string
+          selfie_url: string
+          vote_selfie_url: string
+        }[]
+      }
+      get_payment_proof_url: {
+        Args: { p_donation_id: string }
+        Returns: string
+      }
+      get_registration_safe: {
+        Args: { p_registration_id?: string }
+        Returns: {
+          cedula: string
+          created_at: string
+          donation_status: string
+          full_name: string
+          id: string
+          interest_area: Database["public"]["Enums"]["interest_area"]
+          legal_accepted: boolean
+          oath_accepted: boolean
+          passport_level: string
+          phone: string
+          qr_code: string
+          referral_code: string
+          referred_by: string
+          signature_confirmed: boolean
+          updated_at: string
+          user_id: string
+          user_level: Database["public"]["Enums"]["user_level"]
+          vote_validated_at: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -172,6 +250,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      validate_referral_code: { Args: { p_code: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
