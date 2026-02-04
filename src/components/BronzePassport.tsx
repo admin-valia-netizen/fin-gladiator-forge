@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
 import { Shield, Lock, Gift, Briefcase, Code, Trophy, Wrench, RotateCcw, MapPin, LogOut, Vote, ArrowLeft, Crown, Loader2 } from 'lucide-react';
@@ -33,6 +34,7 @@ const areaLabels = {
 export const BronzePassport = () => {
   const { data, resetDemo, setStep, updateData } = useRegistration();
   const { signOut } = useAuth();
+  const navigate = useNavigate();
   const [showDonationModal, setShowDonationModal] = useState(false);
   const [syncingFromDb, setSyncingFromDb] = useState(true);
 
@@ -110,26 +112,12 @@ export const BronzePassport = () => {
     await signOut();
     resetDemo();
     
-    // Try to close the PWA/window
-    // window.close() only works for windows opened by script
-    // For PWA, we navigate away and try to close
-    try {
-      window.close();
-    } catch (e) {
-      // Fallback: navigate to a goodbye page or show message
-      console.log('Could not close window automatically');
-    }
+    // Clear all storage
+    localStorage.clear();
+    sessionStorage.clear();
     
-    // If window didn't close (common for PWAs not opened by script),
-    // clear everything and stay on a blank state
-    if (!window.closed) {
-      // Clear all local storage
-      localStorage.clear();
-      sessionStorage.clear();
-      
-      // Navigate to auth page as final fallback
-      window.location.href = '/auth';
-    }
+    // Navigate to session closed page
+    navigate('/session-closed', { replace: true });
   };
 
   const handleValidateVote = () => {

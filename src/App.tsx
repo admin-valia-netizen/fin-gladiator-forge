@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Install from "./pages/Install";
 import Admin from "./pages/Admin";
+import SessionClosed from "./pages/SessionClosed";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/auth" element={<Auth />} />
           <Route path="/install" element={<Install />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/session-closed" element={<SessionClosed />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
