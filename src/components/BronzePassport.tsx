@@ -1,11 +1,14 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
-import { Shield, Lock, Gift, Briefcase, Code, Trophy, Wrench, RotateCcw, MapPin, LogOut, Vote, ArrowLeft } from 'lucide-react';
+import { Shield, Lock, Gift, Briefcase, Code, Trophy, Wrench, RotateCcw, MapPin, LogOut, Vote, ArrowLeft, Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useRegistration } from '@/hooks/useRegistration';
 import { useAuth } from '@/hooks/useAuth';
 import { ReferralSystem } from '@/components/ReferralSystem';
 import { FinTablesMapCard } from '@/components/FinTablesMapCard';
+import { DonationModule } from '@/components/DonationModule';
+
 const benefits = [
   { id: 1, title: 'Capital Semilla', icon: <Gift className="w-5 h-5" />, locked: true },
   { id: 2, title: 'Becas Tecnológicas', icon: <Code className="w-5 h-5" />, locked: true },
@@ -30,6 +33,7 @@ const areaLabels = {
 export const BronzePassport = () => {
   const { data, resetDemo, setStep } = useRegistration();
   const { signOut } = useAuth();
+  const [showDonationModal, setShowDonationModal] = useState(false);
 
   const handleLogout = async () => {
     await signOut();
@@ -43,6 +47,9 @@ export const BronzePassport = () => {
   const handleBack = () => {
     setStep('staircase');
   };
+
+  // Check if donation is pending
+  const isDonationPending = data.passportLevel === 'pending_donation';
 
   return (
     <div className="min-h-screen bg-background flex flex-col p-6">
@@ -174,6 +181,36 @@ export const BronzePassport = () => {
           </Button>
         </motion.div>
 
+        {/* Donation Option */}
+        <motion.div
+          className="w-full mt-4"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.47 }}
+        >
+          {isDonationPending ? (
+            <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-center">
+              <div className="flex items-center justify-center gap-2 text-amber-500 font-medium">
+                <Crown className="w-5 h-5" />
+                Validación de Pago Pendiente
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Tu donación está siendo revisada. Te notificaremos cuando sea aprobada.
+              </p>
+            </div>
+          ) : (
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={() => setShowDonationModal(true)}
+              className="w-full border-amber-500/50 text-amber-500 hover:bg-amber-500/10"
+            >
+              <Crown className="w-5 h-5 mr-2" />
+              Obtener Pasaporte Dorado por Donación (RD$5,000)
+            </Button>
+          )}
+        </motion.div>
+
         {/* Important next steps message */}
         <motion.div
           className="w-full mt-6 card-industrial p-5 rounded-xl border-l-4 border-primary"
@@ -196,6 +233,9 @@ export const BronzePassport = () => {
           </p>
           <p className="text-sm text-amber-500 font-semibold mt-3">
             ¡Desbloquea tu Pasaporte Dorado y accede a la Recompensa si ganamos!
+          </p>
+          <p className="text-xs text-muted-foreground mt-2 italic">
+            También puedes obtener el Pasaporte Dorado realizando una donación de RD$5,000.
           </p>
         </motion.div>
 
@@ -298,6 +338,14 @@ export const BronzePassport = () => {
 
       {/* Bottom bronze accent */}
       <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-bronze" />
+
+      {/* Donation Modal */}
+      {showDonationModal && (
+        <DonationModule
+          onClose={() => setShowDonationModal(false)}
+          registrationId={data.registrationId}
+        />
+      )}
     </div>
   );
 };
