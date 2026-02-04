@@ -11,6 +11,7 @@ import { BronzeStaircase } from '@/components/BronzeStaircase';
 import { BronzePassport } from '@/components/BronzePassport';
 import { VoteValidationStep } from '@/components/VoteValidationStep';
 import { GoldenPassport } from '@/components/GoldenPassport';
+import { AdminButton } from '@/components/AdminButton';
 import { Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
@@ -84,6 +85,7 @@ const Index = () => {
 
   return (
     <>
+      <AdminButton />
       <div className="min-h-screen bg-background">
         {currentStep === 'registration' && <RegistrationForm />}
         {currentStep === 'staircase' && <BronzeStaircase />}
