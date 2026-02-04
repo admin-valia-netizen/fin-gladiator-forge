@@ -120,21 +120,21 @@ export const BiometricStep = ({ onComplete }: BiometricStepProps) => {
       initial={{ opacity: 0, x: 50 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -50 }}
-      className="space-y-6"
+      className="space-y-4"
     >
       {/* Step indicator */}
-      <div className="step-bronze step-active p-6 rounded-xl">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-            <ShieldCheck className="w-5 h-5 text-primary" />
+      <div className="step-bronze step-active p-4 rounded-xl">
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+            <ShieldCheck className="w-4 h-4 text-primary" />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-foreground">Validación Biométrica</h2>
-            <p className="text-sm text-muted-foreground">Confirma tu identidad de forma segura</p>
+            <h2 className="text-base font-bold text-foreground">Validación Biométrica</h2>
+            <p className="text-xs text-muted-foreground">Confirma tu identidad de forma segura</p>
           </div>
         </div>
 
-        <p className="text-sm text-muted-foreground">
+        <p className="text-xs text-muted-foreground">
           Para garantizar la seguridad de tu registro, necesitamos verificar tu identidad 
           usando la biometría de tu dispositivo.
         </p>
@@ -143,44 +143,44 @@ export const BiometricStep = ({ onComplete }: BiometricStepProps) => {
       {/* Biometric options */}
       {biometricStatus === 'idle' && (
         <motion.div
-          className="space-y-4"
+          className="space-y-3"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <p className="text-center text-foreground font-medium">
+          <p className="text-center text-foreground font-medium text-sm">
             Elige tu método de verificación:
           </p>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-3">
             {/* Fingerprint option */}
             <motion.button
               onClick={() => startBiometricAuth('fingerprint')}
-              className="card-industrial p-6 rounded-xl border-2 border-bronze/30 hover:border-primary transition-all flex flex-col items-center gap-4"
+              className="card-industrial p-4 rounded-xl border-2 border-bronze/30 hover:border-primary transition-all flex flex-col items-center gap-2"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
-              <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center">
-                <Fingerprint className="w-8 h-8 text-primary" />
+              <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
+                <Fingerprint className="w-6 h-6 text-primary" />
               </div>
               <div className="text-center">
-                <p className="font-bold text-foreground">Huella Digital</p>
-                <p className="text-xs text-muted-foreground mt-1">Touch ID / Lector de huellas</p>
+                <p className="font-bold text-foreground text-sm">Huella Digital</p>
+                <p className="text-xs text-muted-foreground">Touch ID / Lector de huellas</p>
               </div>
             </motion.button>
 
             {/* Face recognition option */}
             <motion.button
               onClick={() => startBiometricAuth('face')}
-              className="card-industrial p-6 rounded-xl border-2 border-bronze/30 hover:border-primary transition-all flex flex-col items-center gap-4"
+              className="card-industrial p-4 rounded-xl border-2 border-bronze/30 hover:border-primary transition-all flex flex-col items-center gap-2"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
-              <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center">
-                <ScanFace className="w-8 h-8 text-primary" />
+              <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
+                <ScanFace className="w-6 h-6 text-primary" />
               </div>
               <div className="text-center">
-                <p className="font-bold text-foreground">Reconocimiento Facial</p>
-                <p className="text-xs text-muted-foreground mt-1">Face ID / Cámara frontal</p>
+                <p className="font-bold text-foreground text-sm">Reconocimiento Facial</p>
+                <p className="text-xs text-muted-foreground">Face ID / Cámara frontal</p>
               </div>
             </motion.button>
           </div>
