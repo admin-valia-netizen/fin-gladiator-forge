@@ -311,6 +311,7 @@ export const RegistrationForm = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
+            className="space-y-3"
           >
             <Button
               type="submit"
@@ -331,6 +332,16 @@ export const RegistrationForm = () => {
                   <ArrowRight className="w-5 h-5" />
                 </>
               )}
+            </Button>
+
+            {/* Quick access for existing users */}
+            <Button
+              type="button"
+              variant="ghost"
+              className="w-full text-muted-foreground hover:text-foreground"
+              onClick={() => setStep('quick-verify')}
+            >
+              ¿Ya te registraste? Accede a tu Pasaporte
             </Button>
           </motion.div>
         </form>

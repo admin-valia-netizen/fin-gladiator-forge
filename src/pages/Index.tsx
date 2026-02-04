@@ -7,6 +7,7 @@ import { WelcomeVideo } from '@/components/WelcomeVideo';
 import { MottoScreen } from '@/components/MottoScreen';
 import { GlossaryScreen } from '@/components/GlossaryScreen';
 import { RegistrationForm } from '@/components/RegistrationForm';
+import { QuickVerification } from '@/components/QuickVerification';
 import { BronzeStaircase } from '@/components/BronzeStaircase';
 import { BronzePassport } from '@/components/BronzePassport';
 import { VoteValidationStep } from '@/components/VoteValidationStep';
@@ -14,7 +15,6 @@ import { GoldenPassport } from '@/components/GoldenPassport';
 import { AdminButton } from '@/components/AdminButton';
 import { Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-
 const Index = () => {
   const { currentStep, setStep, resetDemo } = useRegistration();
   const { isAuthenticated, loading } = useAuth();
@@ -26,7 +26,7 @@ const Index = () => {
       try {
         const parsed = JSON.parse(stored);
         // If currentStep is not in the valid steps, reset to splash
-        const validSteps = ['splash', 'welcome', 'motto', 'glossary', 'onboarding', 'registration', 'staircase', 'passport', 'vote-validation', 'golden-passport'];
+        const validSteps = ['splash', 'welcome', 'motto', 'glossary', 'onboarding', 'registration', 'quick-verify', 'staircase', 'passport', 'vote-validation', 'golden-passport'];
         if (!validSteps.includes(parsed?.state?.currentStep)) {
           resetDemo();
         }
@@ -88,6 +88,7 @@ const Index = () => {
       <AdminButton />
       <div className="min-h-screen bg-background">
         {currentStep === 'registration' && <RegistrationForm />}
+        {currentStep === 'quick-verify' && <QuickVerification />}
         {currentStep === 'staircase' && <BronzeStaircase />}
         {currentStep === 'passport' && <BronzePassport />}
         {currentStep === 'vote-validation' && (
