@@ -14,12 +14,63 @@ export type Database = {
   }
   public: {
     Tables: {
+      donations: {
+        Row: {
+          amount: number
+          cedula_confirmed: string
+          created_at: string
+          id: string
+          payment_proof_url: string
+          registration_id: string
+          rejection_reason: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: Database["public"]["Enums"]["donation_status"]
+          updated_at: string
+        }
+        Insert: {
+          amount?: number
+          cedula_confirmed: string
+          created_at?: string
+          id?: string
+          payment_proof_url: string
+          registration_id: string
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["donation_status"]
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          cedula_confirmed?: string
+          created_at?: string
+          id?: string
+          payment_proof_url?: string
+          registration_id?: string
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["donation_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "donations_registration_id_fkey"
+            columns: ["registration_id"]
+            isOneToOne: false
+            referencedRelation: "registrations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       registrations: {
         Row: {
           cedula: string
           cedula_back_url: string | null
           cedula_front_url: string | null
           created_at: string
+          donation_status: string | null
           full_name: string
           id: string
           interest_area: Database["public"]["Enums"]["interest_area"] | null
@@ -42,6 +93,7 @@ export type Database = {
           cedula_back_url?: string | null
           cedula_front_url?: string | null
           created_at?: string
+          donation_status?: string | null
           full_name: string
           id?: string
           interest_area?: Database["public"]["Enums"]["interest_area"] | null
@@ -64,6 +116,7 @@ export type Database = {
           cedula_back_url?: string | null
           cedula_front_url?: string | null
           created_at?: string
+          donation_status?: string | null
           full_name?: string
           id?: string
           interest_area?: Database["public"]["Enums"]["interest_area"] | null
@@ -83,14 +136,43 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
+      app_role: "admin" | "moderator" | "user"
+      donation_status: "pending" | "approved" | "rejected"
       interest_area:
         | "emprendimiento"
         | "tecnologia"
@@ -224,6 +306,8 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      app_role: ["admin", "moderator", "user"],
+      donation_status: ["pending", "approved", "rejected"],
       interest_area: [
         "emprendimiento",
         "tecnologia",

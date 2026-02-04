@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware';
 
 export type InterestArea = 'emprendimiento' | 'tecnologia' | 'deporte' | 'empleo_tecnico';
 export type UserLevel = 'aspirante' | 'gladiador' | 'campeon';
-export type PassportLevel = 'bronce' | 'dorado';
+export type PassportLevel = 'bronce' | 'dorado' | 'pending_donation';
 
 export interface RegistrationData {
   fullName: string;
