@@ -1,14 +1,14 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
-import { Shield, Lock, Gift, Briefcase, Code, Trophy, Wrench, RotateCcw, MapPin, LogOut, Vote, ArrowLeft, Crown } from 'lucide-react';
+import { Shield, Lock, Gift, Briefcase, Code, Trophy, Wrench, RotateCcw, MapPin, LogOut, Vote, ArrowLeft, Crown, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useRegistration } from '@/hooks/useRegistration';
 import { useAuth } from '@/hooks/useAuth';
 import { ReferralSystem } from '@/components/ReferralSystem';
 import { FinTablesMapCard } from '@/components/FinTablesMapCard';
 import { DonationModule } from '@/components/DonationModule';
-
+import { supabase } from '@/integrations/supabase/client';
 const benefits = [
   { id: 1, title: 'Capital Semilla', icon: <Gift className="w-5 h-5" />, locked: true },
   { id: 2, title: 'Becas Tecnológicas', icon: <Code className="w-5 h-5" />, locked: true },
@@ -31,9 +31,62 @@ const areaLabels = {
 };
 
 export const BronzePassport = () => {
-  const { data, resetDemo, setStep } = useRegistration();
+  const { data, resetDemo, setStep, updateData } = useRegistration();
   const { signOut } = useAuth();
   const [showDonationModal, setShowDonationModal] = useState(false);
+  const [syncingFromDb, setSyncingFromDb] = useState(true);
+
+  // Sync passport level from database on mount
+  useEffect(() => {
+    const syncPassportLevel = async () => {
+      if (!data.registrationId) {
+        setSyncingFromDb(false);
+        return;
+      }
+
+      try {
+        const { data: registration, error } = await supabase
+          .from('registrations')
+          .select('passport_level, donation_status, user_level')
+          .eq('id', data.registrationId)
+          .single();
+
+        if (error) throw error;
+
+        if (registration) {
+          // Update local state with DB values
+          updateData({
+            passportLevel: registration.passport_level as any,
+            userLevel: registration.user_level as any,
+          });
+
+          // If passport is golden, redirect to golden passport
+          if (registration.passport_level === 'dorado') {
+            setStep('golden-passport');
+            return;
+          }
+
+          // If donation was approved, update local state
+          if (registration.donation_status === 'approved') {
+            updateData({ passportLevel: 'dorado' });
+            setStep('golden-passport');
+            return;
+          }
+
+          // If donation is pending, update local state
+          if (registration.donation_status === 'pending') {
+            updateData({ passportLevel: 'pending_donation' });
+          }
+        }
+      } catch (err) {
+        console.error('Error syncing passport level:', err);
+      } finally {
+        setSyncingFromDb(false);
+      }
+    };
+
+    syncPassportLevel();
+  }, [data.registrationId, updateData, setStep]);
 
   const handleLogout = async () => {
     await signOut();
@@ -50,6 +103,23 @@ export const BronzePassport = () => {
 
   // Check if donation is pending
   const isDonationPending = data.passportLevel === 'pending_donation';
+
+  // Show loading while syncing
+  if (syncingFromDb) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="absolute inset-0 bg-gradient-carbon" />
+        <motion.div
+          className="relative z-10 flex flex-col items-center gap-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+        >
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          <p className="text-muted-foreground">Verificando estado del pasaporte...</p>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex flex-col p-6">
