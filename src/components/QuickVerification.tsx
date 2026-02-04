@@ -43,7 +43,7 @@ export const QuickVerification = () => {
       // Check if user exists with this cedula
       const { data: existing, error } = await supabase
         .from('registrations')
-        .select('id, full_name, cedula, phone, passport_level, qr_code, referral_code, signature_confirmed')
+        .select('id, full_name, cedula, phone, passport_level, qr_code, referral_code, interest_area, selfie_url')
         .eq('cedula', formData.cedula)
         .maybeSingle();
 
@@ -60,8 +60,10 @@ export const QuickVerification = () => {
         return;
       }
 
-      // Check if registration is complete (has gone through staircase)
-      if (!existing.signature_confirmed) {
+      // Check if registration is complete (has interest_area which is set in final step of staircase)
+      const isComplete = existing.interest_area !== null;
+
+      if (!isComplete) {
         toast.info('Tu registro no está completo. Continuando desde donde lo dejaste...');
         
         updateData({
@@ -87,6 +89,7 @@ export const QuickVerification = () => {
         qrCode: existing.qr_code ?? undefined,
         referralCode: `FIN-${existing.cedula}`,
         passportLevel: existing.passport_level as any,
+        interestArea: existing.interest_area as any,
       });
 
       toast.success('¡Registro encontrado! Verifica tu identidad.');
