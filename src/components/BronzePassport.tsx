@@ -109,6 +109,27 @@ export const BronzePassport = () => {
   const handleLogout = async () => {
     await signOut();
     resetDemo();
+    
+    // Try to close the PWA/window
+    // window.close() only works for windows opened by script
+    // For PWA, we navigate away and try to close
+    try {
+      window.close();
+    } catch (e) {
+      // Fallback: navigate to a goodbye page or show message
+      console.log('Could not close window automatically');
+    }
+    
+    // If window didn't close (common for PWAs not opened by script),
+    // clear everything and stay on a blank state
+    if (!window.closed) {
+      // Clear all local storage
+      localStorage.clear();
+      sessionStorage.clear();
+      
+      // Navigate to auth page as final fallback
+      window.location.href = '/auth';
+    }
   };
 
   const handleValidateVote = () => {
