@@ -298,10 +298,32 @@ const EvidenceStep = ({ onComplete }: { onComplete: () => void }) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // Server-side validation constants
+    const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+    const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+
+    // Validate file size
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error('Archivo muy grande. Máximo 10MB.');
+      return;
+    }
+
+    // Validate file type
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      toast.error('Solo se permiten imágenes JPG, PNG o WEBP.');
+      return;
+    }
+
     setIsUploading(true);
     
     try {
-      const fileExt = file.name.split('.').pop();
+      const fileExt = file.name.split('.').pop()?.toLowerCase();
+      // Validate extension matches allowed types
+      if (!fileExt || !['jpg', 'jpeg', 'png', 'webp'].includes(fileExt)) {
+        toast.error('Extensión de archivo no válida.');
+        return;
+      }
+      
       const fileName = `${data.cedula}/${currentPhoto}-${Date.now()}.${fileExt}`;
       
       const { error: uploadError } = await supabase.storage

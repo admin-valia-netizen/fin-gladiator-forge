@@ -50,15 +50,26 @@ export const DonationModule = ({ onClose, registrationId }: DonationModuleProps)
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // Validate file type
-      if (!file.type.startsWith('image/')) {
-        setError('Por favor selecciona una imagen válida');
+      // Server-side validation constants
+      const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+      const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+
+      // Validate file type with stricter check
+      if (!ALLOWED_TYPES.includes(file.type)) {
+        setError('Solo se permiten imágenes JPG, PNG o WEBP.');
         return;
       }
       
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        setError('La imagen no debe superar los 5MB');
+      // Validate file size (max 10MB)
+      if (file.size > MAX_FILE_SIZE) {
+        setError('La imagen no debe superar los 10MB');
+        return;
+      }
+
+      // Validate file extension
+      const fileExt = file.name.split('.').pop()?.toLowerCase();
+      if (!fileExt || !['jpg', 'jpeg', 'png', 'webp'].includes(fileExt)) {
+        setError('Extensión de archivo no válida.');
         return;
       }
 
