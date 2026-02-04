@@ -39,29 +39,47 @@ export const BronzePassport = () => {
   // Sync passport level from database on mount
   useEffect(() => {
     const syncPassportLevel = async () => {
-      if (!data.registrationId) {
+      console.log('[BronzePassport] Syncing - registrationId:', data.registrationId, 'cedula:', data.cedula);
+      
+      // Try to find registration by ID first, then by cedula as fallback
+      let query = supabase
+        .from('registrations')
+        .select('id, passport_level, donation_status, user_level');
+      
+      if (data.registrationId) {
+        query = query.eq('id', data.registrationId);
+      } else if (data.cedula) {
+        query = query.eq('cedula', data.cedula);
+      } else {
+        console.log('[BronzePassport] No registrationId or cedula, skipping sync');
         setSyncingFromDb(false);
         return;
       }
 
       try {
-        const { data: registration, error } = await supabase
-          .from('registrations')
-          .select('passport_level, donation_status, user_level')
-          .eq('id', data.registrationId)
-          .single();
+        const { data: registration, error } = await query.single();
+
+        console.log('[BronzePassport] DB result:', registration, 'error:', error);
 
         if (error) throw error;
 
         if (registration) {
+          // Update registrationId if we found it by cedula
+          if (!data.registrationId && registration.id) {
+            updateData({ registrationId: registration.id });
+          }
+
           // Update local state with DB values
           updateData({
             passportLevel: registration.passport_level as any,
             userLevel: registration.user_level as any,
           });
 
+          console.log('[BronzePassport] Passport level from DB:', registration.passport_level);
+
           // If passport is golden, redirect to golden passport
           if (registration.passport_level === 'dorado') {
+            console.log('[BronzePassport] Redirecting to golden-passport');
             setStep('golden-passport');
             return;
           }
@@ -79,14 +97,14 @@ export const BronzePassport = () => {
           }
         }
       } catch (err) {
-        console.error('Error syncing passport level:', err);
+        console.error('[BronzePassport] Error syncing passport level:', err);
       } finally {
         setSyncingFromDb(false);
       }
     };
 
     syncPassportLevel();
-  }, [data.registrationId, updateData, setStep]);
+  }, [data.registrationId, data.cedula, updateData, setStep]);
 
   const handleLogout = async () => {
     await signOut();
