@@ -147,29 +147,29 @@ const Auth = () => {
 
       {/* Header with Logo */}
       <motion.header
-        className="relative z-10 px-6 py-8 flex justify-center"
+        className="relative z-10 px-6 py-4 flex justify-center"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
       >
         <img 
           src={finLogo} 
           alt="FIN - Frente de Integridad Nacional" 
-          className="w-32 h-32 object-contain"
+          className="w-20 h-20 object-contain"
         />
       </motion.header>
 
       {/* Content */}
       <motion.div
-        className="relative z-10 flex-1 px-6 pb-8 flex flex-col justify-center max-w-md mx-auto w-full"
+        className="relative z-10 flex-1 px-6 pb-6 flex flex-col justify-center max-w-md mx-auto w-full"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
       >
         {/* Toggle */}
-        <div className="flex mb-8 bg-card rounded-xl p-1 border border-bronze/30">
+        <div className="flex mb-6 bg-card rounded-xl p-1 border border-bronze/30">
           <button
             onClick={() => setIsSignUp(true)}
-            className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all flex items-center justify-center gap-2 ${
+            className={`flex-1 py-2.5 px-3 rounded-lg font-medium transition-all flex items-center justify-center gap-2 text-sm ${
               isSignUp 
                 ? 'bg-gradient-neon text-primary-foreground shadow-neon' 
                 : 'text-muted-foreground hover:text-foreground'
@@ -180,7 +180,7 @@ const Auth = () => {
           </button>
           <button
             onClick={() => setIsSignUp(false)}
-            className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all flex items-center justify-center gap-2 ${
+            className={`flex-1 py-2.5 px-3 rounded-lg font-medium transition-all flex items-center justify-center gap-2 text-sm ${
               !isSignUp 
                 ? 'bg-gradient-neon text-primary-foreground shadow-neon' 
                 : 'text-muted-foreground hover:text-foreground'
@@ -192,9 +192,9 @@ const Auth = () => {
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <div className="space-y-2">
-            <Label htmlFor="email" className="flex items-center gap-2 text-foreground">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div className="space-y-1.5">
+            <Label htmlFor="email" className="flex items-center gap-2 text-foreground text-sm">
               <Mail className="w-4 h-4 text-bronze" />
               Correo Electrónico
             </Label>
@@ -202,16 +202,16 @@ const Auth = () => {
               id="email"
               type="email"
               placeholder="tu@correo.com"
-              className="bg-card border-bronze/30 focus:border-primary h-12"
+              className="bg-card border-bronze/30 focus:border-primary h-11"
               {...register('email')}
             />
             {errors.email && (
-              <p className="text-sm text-destructive">{errors.email.message}</p>
+              <p className="text-xs text-destructive">{errors.email.message}</p>
             )}
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="password" className="flex items-center gap-2 text-foreground">
+          <div className="space-y-1.5">
+            <Label htmlFor="password" className="flex items-center gap-2 text-foreground text-sm">
               <Lock className="w-4 h-4 text-bronze" />
               Contraseña
             </Label>
@@ -219,11 +219,11 @@ const Auth = () => {
               id="password"
               type="password"
               placeholder="••••••••"
-              className="bg-card border-bronze/30 focus:border-primary h-12"
+              className="bg-card border-bronze/30 focus:border-primary h-11"
               {...register('password')}
             />
             {errors.password && (
-              <p className="text-sm text-destructive">{errors.password.message}</p>
+              <p className="text-xs text-destructive">{errors.password.message}</p>
             )}
           </div>
 
@@ -249,7 +249,7 @@ const Auth = () => {
           </Button>
         </form>
 
-        <p className="text-center text-sm text-muted-foreground mt-6">
+        <p className="text-center text-sm text-muted-foreground mt-4">
           {isSignUp 
             ? '¿Ya tienes cuenta? ' 
             : '¿No tienes cuenta? '}
