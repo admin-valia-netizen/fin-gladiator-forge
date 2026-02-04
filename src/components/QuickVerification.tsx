@@ -40,23 +40,31 @@ export const QuickVerification = () => {
     setIsVerifying(true);
 
     try {
-      // Check if user exists with this cedula
+      // Get current authenticated user
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      
+      if (userError || !user) {
+        toast.error('Debes iniciar sesión para verificar tu registro.');
+        return;
+      }
+
+      // Check if user has a registration linked to their account
       const { data: existing, error } = await supabase
         .from('registrations')
         .select('id, full_name, cedula, phone, passport_level, qr_code, referral_code, interest_area, selfie_url')
-        .eq('cedula', formData.cedula)
+        .eq('user_id', user.id)
         .maybeSingle();
 
       if (error) throw error;
 
       if (!existing) {
-        toast.error('No encontramos un registro con esa cédula. ¿Eres nuevo? Regístrate primero.');
+        toast.error('No encontramos un registro vinculado a tu cuenta. ¿Eres nuevo? Regístrate primero.');
         return;
       }
 
-      // Verify phone matches
-      if (existing.phone !== formData.phone) {
-        toast.error('El teléfono no coincide con el registro.');
+      // Verify cedula and phone match the stored registration
+      if (existing.cedula !== formData.cedula || existing.phone !== formData.phone) {
+        toast.error('Los datos ingresados no coinciden con tu registro.');
         return;
       }
 

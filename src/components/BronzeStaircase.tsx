@@ -317,6 +317,14 @@ const EvidenceStep = ({ onComplete }: { onComplete: () => void }) => {
     setIsUploading(true);
     
     try {
+      // Get current authenticated user for secure file path
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      
+      if (userError || !user) {
+        toast.error('Debes iniciar sesión para subir archivos.');
+        return;
+      }
+
       const fileExt = file.name.split('.').pop()?.toLowerCase();
       // Validate extension matches allowed types
       if (!fileExt || !['jpg', 'jpeg', 'png', 'webp'].includes(fileExt)) {
@@ -324,7 +332,8 @@ const EvidenceStep = ({ onComplete }: { onComplete: () => void }) => {
         return;
       }
       
-      const fileName = `${data.cedula}/${currentPhoto}-${Date.now()}.${fileExt}`;
+      // Use user_id in file path for RLS compliance
+      const fileName = `${user.id}/${currentPhoto}-${Date.now()}.${fileExt}`;
       
       const { error: uploadError } = await supabase.storage
         .from('evidencias')
@@ -332,25 +341,31 @@ const EvidenceStep = ({ onComplete }: { onComplete: () => void }) => {
 
       if (uploadError) throw uploadError;
 
-      const { data: urlData } = supabase.storage
+      // Create signed URL for secure access (1 hour expiry)
+      const { data: signedUrlData, error: signedError } = await supabase.storage
         .from('evidencias')
-        .getPublicUrl(fileName);
+        .createSignedUrl(fileName, 3600);
 
-      const url = urlData.publicUrl;
+      if (signedError) throw signedError;
+
+      const url = signedUrlData.signedUrl;
       
       setPhotos(prev => ({ ...prev, [currentPhoto]: url }));
       
-      // Update in database
+      // Update in database - store the file path, not the signed URL
       const columnMap = {
         front: 'cedula_front_url',
         back: 'cedula_back_url',
         selfie: 'selfie_url',
       };
       
+      // Store the permanent file reference (path) in the database
+      const storagePath = `${fileName}`;
+      
       if (data.registrationId) {
         await supabase
           .from('registrations')
-          .update({ [columnMap[currentPhoto]]: url })
+          .update({ [columnMap[currentPhoto]]: storagePath })
           .eq('id', data.registrationId);
       }
 
