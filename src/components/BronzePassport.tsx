@@ -10,6 +10,9 @@ import { ReferralSystem } from '@/components/ReferralSystem';
 import { FinTablesMapCard } from '@/components/FinTablesMapCard';
 import { DonationModule } from '@/components/DonationModule';
 import { supabase } from '@/integrations/supabase/client';
+
+const REQUIRED_REFERRALS = 50;
+
 const benefits = [
   { id: 1, title: 'Capital Semilla', icon: <Gift className="w-5 h-5" />, locked: true },
   { id: 2, title: 'Becas Tecnológicas', icon: <Code className="w-5 h-5" />, locked: true },
@@ -37,6 +40,7 @@ export const BronzePassport = () => {
   const navigate = useNavigate();
   const [showDonationModal, setShowDonationModal] = useState(false);
   const [syncingFromDb, setSyncingFromDb] = useState(true);
+  const [completedReferrals, setCompletedReferrals] = useState(0);
 
   // Sync passport level from database on mount
   useEffect(() => {
@@ -106,7 +110,31 @@ export const BronzePassport = () => {
     };
 
     syncPassportLevel();
-  }, [data.registrationId, data.cedula, updateData, setStep]);
+  }, [data.registrationId, data.cedula, updateData, setStep, forceShowBronze]);
+
+  // Fetch referral count
+  useEffect(() => {
+    const fetchReferralCount = async () => {
+      const referralCode = data.referralCode || (data.cedula ? `FIN-${data.cedula}` : null);
+      if (!referralCode) return;
+
+      try {
+        const { data: refs, error } = await supabase
+          .from('registrations')
+          .select('id, passport_level')
+          .eq('referred_by', referralCode);
+
+        if (!error && refs) {
+          const completed = refs.filter(r => r.passport_level === 'bronce' || r.passport_level === 'dorado').length;
+          setCompletedReferrals(completed);
+        }
+      } catch (err) {
+        console.error('[BronzePassport] Error fetching referrals:', err);
+      }
+    };
+
+    fetchReferralCount();
+  }, [data.referralCode, data.cedula]);
 
   const handleLogout = async () => {
     await signOut();
@@ -132,6 +160,11 @@ export const BronzePassport = () => {
 
   // Check if donation is pending
   const isDonationPending = data.passportLevel === 'pending_donation';
+
+  // Check if user can validate vote (has 50 referrals OR is golden passport holder)
+  const hasEnoughReferrals = completedReferrals >= REQUIRED_REFERRALS;
+  const isGoldenPassport = data.passportLevel === 'dorado';
+  const canValidateVote = hasEnoughReferrals || isGoldenPassport || isDonationPending;
 
   // Show loading while syncing
   if (syncingFromDb) {
@@ -273,12 +306,33 @@ export const BronzePassport = () => {
             variant="gladiator"
             size="xl"
             onClick={handleValidateVote}
-            className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 shadow-[0_0_20px_rgba(245,158,11,0.3)]"
+            disabled={!canValidateVote}
+            className={`w-full ${
+              canValidateVote 
+                ? 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 shadow-[0_0_20px_rgba(245,158,11,0.3)]' 
+                : 'bg-muted text-muted-foreground cursor-not-allowed'
+            }`}
           >
             <Vote className="w-5 h-5 mr-2" />
             YA VOTÉ - VALIDAR MI VOTO
           </Button>
         </motion.div>
+
+        {/* Requirement message if button is disabled */}
+        {!canValidateVote && (
+          <motion.div
+            className="w-full mt-2"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            <p className="text-xs text-center text-muted-foreground">
+              Para validar tu voto necesitas <span className="text-amber-500 font-semibold">50 referidos activos</span> o haber <span className="text-amber-500 font-semibold">donado RD$5,000</span>
+            </p>
+            <p className="text-xs text-center text-muted-foreground mt-1">
+              Actualmente tienes <span className="text-primary font-semibold">{completedReferrals}/{REQUIRED_REFERRALS}</span> referidos completados
+            </p>
+          </motion.div>
+        )}
 
         {/* Donation Option */}
         <motion.div
