@@ -27,7 +27,7 @@ const rewards = [
   {
     icon: <Anchor className="w-8 h-8" />,
     title: 'EMPLEO POR MÉRITO',
-    description: 'Prioridad absoluta en las vacantes de GESEMA, el Astillero Nacional y puestos de élite del Estado. Sin cartas de recomendación, solo tu talento.',
+    description: 'Prioridad absoluta en las vacantes de GESEMA, el Astillero Nacional y puestos del Estado. Sin cartas de recomendación, solo tu talento.',
     color: 'text-emerald-400',
     bgColor: 'bg-emerald-400/10',
   },
