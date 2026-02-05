@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { Shield, Hand, Camera, MapPin, Check, Loader2, ShieldCheck, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useRegistration } from '@/hooks/useRegistration';
@@ -44,6 +44,51 @@ const steps: Step[] = [
 
 export const BronzeStaircase = () => {
   const { staircaseStep, setStaircaseStep, data, updateData, setStep } = useRegistration();
+  const [isCheckingPhotos, setIsCheckingPhotos] = useState(true);
+
+  // Check if user already has photos on mount - skip to biometric if so
+  useEffect(() => {
+    const checkExistingPhotos = async () => {
+      if (!data.registrationId) {
+        setIsCheckingPhotos(false);
+        return;
+      }
+
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          setIsCheckingPhotos(false);
+          return;
+        }
+
+        // Check if user already has photos uploaded
+        const { data: urls } = await supabase.rpc('get_own_document_urls', {
+          p_registration_id: data.registrationId
+        });
+
+        if (urls && urls.length > 0) {
+          const { cedula_front_url, cedula_back_url, selfie_url } = urls[0];
+          
+          // If all photos exist, skip directly to biometric step (step 3)
+          if (cedula_front_url && cedula_back_url && selfie_url) {
+            // Also check if oath was already accepted
+            if (data.oathAccepted) {
+              setStaircaseStep(3); // Go to biometric
+            } else {
+              // Need to take oath first, then skip photos
+              setStaircaseStep(1);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error checking photos:', error);
+      } finally {
+        setIsCheckingPhotos(false);
+      }
+    };
+
+    checkExistingPhotos();
+  }, [data.registrationId, data.oathAccepted, setStaircaseStep]);
 
   const handleBack = () => {
     if (staircaseStep > 1) {
@@ -52,12 +97,53 @@ export const BronzeStaircase = () => {
       setStep('registration');
     }
   };
+
+  // Handler for oath completion - skip photos if they already exist
+  const handleOathComplete = async () => {
+    if (!data.registrationId) {
+      setStaircaseStep(2);
+      return;
+    }
+
+    try {
+      const { data: urls } = await supabase.rpc('get_own_document_urls', {
+        p_registration_id: data.registrationId
+      });
+
+      if (urls && urls.length > 0) {
+        const { cedula_front_url, cedula_back_url, selfie_url } = urls[0];
+        
+        // If all photos exist, skip to biometric
+        if (cedula_front_url && cedula_back_url && selfie_url) {
+          toast.success('¡Fotos ya registradas! Pasando a verificación biométrica.');
+          setStaircaseStep(3);
+          return;
+        }
+      }
+    } catch (error) {
+      console.error('Error checking photos:', error);
+    }
+
+    // Default: go to photos step
+    setStaircaseStep(2);
+  };
   
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-carbon" />
       
+      {/* Loading state while checking photos */}
+      {isCheckingPhotos && (
+        <div className="absolute inset-0 z-50 bg-background flex items-center justify-center">
+          <motion.div
+            className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full"
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+          />
+        </div>
+      )}
+
       {/* Header */}
       <motion.header
         className="relative z-10 px-6 py-6"
@@ -104,7 +190,7 @@ export const BronzeStaircase = () => {
       <div className="relative z-10 flex-1 px-6 pb-8">
         <AnimatePresence mode="wait">
           {staircaseStep === 1 && (
-            <OathStep key="oath" onComplete={() => setStaircaseStep(2)} />
+            <OathStep key="oath" onComplete={handleOathComplete} />
           )}
           {staircaseStep === 2 && (
             <EvidenceStep key="evidence" onComplete={() => setStaircaseStep(3)} />
