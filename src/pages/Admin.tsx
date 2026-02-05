@@ -10,7 +10,13 @@ import {
   Crown,
   ArrowLeft,
   Users,
-  Clock
+   Clock,
+   DollarSign,
+   Download,
+   Settings,
+   Trash2,
+   BookOpen,
+   RefreshCw
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -33,6 +39,13 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -67,6 +80,9 @@ export default function Admin() {
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [rejectionReason, setRejectionReason] = useState('');
   const [processing, setProcessing] = useState(false);
+  const [showResetModal, setShowResetModal] = useState(false);
+  const [resetConfirmText, setResetConfirmText] = useState('');
+  const [resetting, setResetting] = useState(false);
 
   // Check if user is admin
   useEffect(() => {
@@ -333,6 +349,78 @@ export default function Admin() {
   }
 
   const pendingCount = donations.filter(d => d.status === 'pending').length;
+  const approvedDonations = donations.filter(d => d.status === 'approved');
+  const totalRecaudado = approvedDonations.reduce((sum, d) => sum + d.amount, 0);
+
+  // Export approved sponsors to CSV
+  const handleExportSponsors = () => {
+    const csvContent = [
+      ['Nombre', 'Cédula', 'Teléfono', 'Monto', 'Fecha Aprobación'].join(','),
+      ...approvedDonations.map(d => [
+        `"${d.registration?.full_name || 'N/A'}"`,
+        d.cedula_confirmed,
+        d.registration?.phone || 'N/A',
+        d.amount,
+        formatDate(d.created_at)
+      ].join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `patrocinadores-fin-${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+
+    toast({
+      title: 'Exportación completada',
+      description: `Se exportaron ${approvedDonations.length} patrocinadores.`,
+    });
+  };
+
+  // Reset all data
+  const handleResetAllData = async () => {
+    if (resetConfirmText !== 'REINICIAR') return;
+    
+    setResetting(true);
+    
+    try {
+      // Delete all donations first (due to foreign key)
+      const { error: donationsError } = await supabase
+        .from('donations')
+        .delete()
+        .neq('id', '00000000-0000-0000-0000-000000000000'); // Delete all
+
+      if (donationsError) throw donationsError;
+
+      // Delete all registrations
+      const { error: regError } = await supabase
+        .from('registrations')
+        .delete()
+        .neq('id', '00000000-0000-0000-0000-000000000000'); // Delete all
+
+      if (regError) throw regError;
+
+      // Refresh donations list
+      setDonations([]);
+      
+      toast({
+        title: '¡Datos reiniciados!',
+        description: 'Todos los registros y donaciones han sido eliminados.',
+      });
+
+      setShowResetModal(false);
+      setResetConfirmText('');
+    } catch (err: any) {
+      console.error('Error resetting data:', err);
+      toast({
+        title: 'Error',
+        description: err.message || 'No se pudieron reiniciar los datos',
+        variant: 'destructive',
+      });
+    } finally {
+      setResetting(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -365,12 +453,12 @@ export default function Admin() {
           </div>
         </motion.div>
 
-        {/* Stats */}
+        {/* Stats with Total Recaudado */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8"
+          className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8"
         >
           <Card className="border-amber-500/30">
             <CardContent className="p-6 flex items-center gap-4">
@@ -390,10 +478,22 @@ export default function Admin() {
                 <CheckCircle className="w-6 h-6 text-green-500" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-foreground">
-                  {donations.filter(d => d.status === 'approved').length}
-                </p>
+                <p className="text-2xl font-bold text-foreground">{approvedDonations.length}</p>
                 <p className="text-sm text-muted-foreground">Aprobadas</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-primary/30 bg-gradient-to-br from-primary/10 to-transparent">
+            <CardContent className="p-6 flex items-center gap-4">
+              <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
+                <DollarSign className="w-6 h-6 text-primary" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-foreground">
+                  RD${totalRecaudado.toLocaleString()}
+                </p>
+                <p className="text-sm text-muted-foreground">Total Recaudado</p>
               </div>
             </CardContent>
           </Card>
@@ -411,114 +511,332 @@ export default function Admin() {
           </Card>
         </motion.div>
 
-        {/* Donations Table */}
+        {/* Tabs for different sections */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Crown className="w-5 h-5 text-amber-500" />
-                Solicitudes de Donación
-              </CardTitle>
-              <CardDescription>
-                Gestiona las solicitudes de Pasaporte Dorado por donación
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {loading ? (
-                <div className="flex items-center justify-center py-12">
-                  <Loader2 className="w-8 h-8 animate-spin text-primary" />
-                </div>
-              ) : donations.length === 0 ? (
-                <div className="text-center py-12 text-muted-foreground">
-                  No hay solicitudes de donación aún
-                </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Nombre</TableHead>
-                        <TableHead>Cédula</TableHead>
-                        <TableHead>Fecha</TableHead>
-                        <TableHead>Comprobante</TableHead>
-                        <TableHead>Estado</TableHead>
-                        <TableHead className="text-right">Acciones</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {donations.map((donation) => (
-                        <TableRow key={donation.id}>
-                          <TableCell className="font-medium">
-                            {donation.registration?.full_name || 'N/A'}
-                          </TableCell>
-                          <TableCell className="font-mono">
-                            {donation.cedula_confirmed}
-                          </TableCell>
-                          <TableCell className="text-muted-foreground">
-                            {formatDate(donation.created_at)}
-                          </TableCell>
-                          <TableCell>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => {
-                                setSelectedDonation(donation);
-                                setShowImageModal(true);
-                              }}
-                            >
-                              <Eye className="w-4 h-4 mr-1" />
-                              Ver
-                            </Button>
-                          </TableCell>
-                          <TableCell>
-                            {getStatusBadge(donation.status)}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            {donation.status === 'pending' && (
-                              <div className="flex gap-2 justify-end">
+          <Tabs defaultValue="donations" className="w-full">
+            <TabsList className="grid w-full grid-cols-3 mb-6">
+              <TabsTrigger value="donations" className="flex items-center gap-2">
+                <Crown className="w-4 h-4" />
+                Donaciones
+              </TabsTrigger>
+              <TabsTrigger value="sponsors" className="flex items-center gap-2">
+                <Download className="w-4 h-4" />
+                Patrocinadores
+              </TabsTrigger>
+              <TabsTrigger value="settings" className="flex items-center gap-2">
+                <Settings className="w-4 h-4" />
+                Configuración
+              </TabsTrigger>
+            </TabsList>
+
+            {/* Donations Tab */}
+            <TabsContent value="donations">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Crown className="w-5 h-5 text-amber-500" />
+                    Solicitudes de Donación
+                  </CardTitle>
+                  <CardDescription>
+                    Gestiona las solicitudes de Pasaporte Dorado por donación
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {loading ? (
+                    <div className="flex items-center justify-center py-12">
+                      <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                    </div>
+                  ) : donations.length === 0 ? (
+                    <div className="text-center py-12 text-muted-foreground">
+                      No hay solicitudes de donación aún
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Nombre</TableHead>
+                            <TableHead>Cédula</TableHead>
+                            <TableHead>Fecha</TableHead>
+                            <TableHead>Comprobante</TableHead>
+                            <TableHead>Estado</TableHead>
+                            <TableHead className="text-right">Acciones</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {donations.map((donation) => (
+                            <TableRow key={donation.id}>
+                              <TableCell className="font-medium">
+                                {donation.registration?.full_name || 'N/A'}
+                              </TableCell>
+                              <TableCell className="font-mono">
+                                {donation.cedula_confirmed}
+                              </TableCell>
+                              <TableCell className="text-muted-foreground">
+                                {formatDate(donation.created_at)}
+                              </TableCell>
+                              <TableCell>
                                 <Button
+                                  variant="ghost"
                                   size="sm"
-                                  variant="outline"
-                                  className="border-green-500 text-green-500 hover:bg-green-500/10"
-                                  onClick={() => handleApprove(donation)}
-                                  disabled={processing}
-                                >
-                                  <CheckCircle className="w-4 h-4 mr-1" />
-                                  Aprobar
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  className="border-red-500 text-red-500 hover:bg-red-500/10"
                                   onClick={() => {
                                     setSelectedDonation(donation);
-                                    setShowRejectModal(true);
+                                    setShowImageModal(true);
                                   }}
-                                  disabled={processing}
                                 >
-                                  <XCircle className="w-4 h-4 mr-1" />
-                                  Rechazar
+                                  <Eye className="w-4 h-4 mr-1" />
+                                  Ver
                                 </Button>
-                              </div>
-                            )}
-                            {donation.status === 'rejected' && donation.rejection_reason && (
-                              <span className="text-xs text-muted-foreground italic">
-                                {donation.rejection_reason}
-                              </span>
-                            )}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                              </TableCell>
+                              <TableCell>
+                                {getStatusBadge(donation.status)}
+                              </TableCell>
+                              <TableCell className="text-right">
+                                {donation.status === 'pending' && (
+                                  <div className="flex gap-2 justify-end">
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      className="border-green-500 text-green-500 hover:bg-green-500/10"
+                                      onClick={() => handleApprove(donation)}
+                                      disabled={processing}
+                                    >
+                                      <CheckCircle className="w-4 h-4 mr-1" />
+                                      Aprobar
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      className="border-red-500 text-red-500 hover:bg-red-500/10"
+                                      onClick={() => {
+                                        setSelectedDonation(donation);
+                                        setShowRejectModal(true);
+                                      }}
+                                      disabled={processing}
+                                    >
+                                      <XCircle className="w-4 h-4 mr-1" />
+                                      Rechazar
+                                    </Button>
+                                  </div>
+                                )}
+                                {donation.status === 'rejected' && donation.rejection_reason && (
+                                  <span className="text-xs text-muted-foreground italic">
+                                    {donation.rejection_reason}
+                                  </span>
+                                )}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Sponsors Export Tab */}
+            <TabsContent value="sponsors">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Download className="w-5 h-5 text-primary" />
+                    Exportar Patrocinadores
+                  </CardTitle>
+                  <CardDescription>
+                    Descarga la lista de patrocinadores aprobados para contabilidad
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="p-6 rounded-xl bg-muted/50 border border-border">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-lg font-bold text-foreground">
+                          {approvedDonations.length} Patrocinadores
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          Total recaudado: <span className="font-bold text-primary">RD${totalRecaudado.toLocaleString()}</span>
+                        </p>
+                      </div>
+                      <Button 
+                        onClick={handleExportSponsors}
+                        disabled={approvedDonations.length === 0}
+                        className="bg-gradient-to-r from-primary to-primary/80"
+                      >
+                        <Download className="w-4 h-4 mr-2" />
+                        Exportar CSV
+                      </Button>
+                    </div>
+                  </div>
+
+                  {approvedDonations.length > 0 && (
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Nombre</TableHead>
+                            <TableHead>Cédula</TableHead>
+                            <TableHead>Teléfono</TableHead>
+                            <TableHead className="text-right">Monto</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {approvedDonations.map((donation) => (
+                            <TableRow key={donation.id}>
+                              <TableCell className="font-medium">
+                                {donation.registration?.full_name || 'N/A'}
+                              </TableCell>
+                              <TableCell className="font-mono">
+                                {donation.cedula_confirmed}
+                              </TableCell>
+                              <TableCell>
+                                {donation.registration?.phone || 'N/A'}
+                              </TableCell>
+                              <TableCell className="text-right font-bold text-primary">
+                                RD${donation.amount.toLocaleString()}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Settings Tab */}
+            <TabsContent value="settings">
+              <div className="space-y-6">
+                {/* Admin Manual */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <BookOpen className="w-5 h-5 text-primary" />
+                      Manual del Administrador
+                    </CardTitle>
+                    <CardDescription>
+                      Guía técnica para la gestión del sistema
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Accordion type="single" collapsible className="w-full">
+                      <AccordionItem value="roles">
+                        <AccordionTrigger>¿Cómo asignar roles de administrador?</AccordionTrigger>
+                        <AccordionContent>
+                          <div className="space-y-3 text-sm">
+                            <p className="text-muted-foreground">
+                              Para asignar el rol de administrador a un usuario, ejecuta el siguiente SQL desde la consola de Supabase:
+                            </p>
+                            <pre className="p-3 rounded-lg bg-muted font-mono text-xs overflow-x-auto">
+{`INSERT INTO public.user_roles (user_id, role)
+VALUES ('UUID_DEL_USUARIO', 'admin');`}
+                            </pre>
+                            <p className="text-muted-foreground">
+                              Reemplaza <code className="px-1 py-0.5 bg-muted rounded">UUID_DEL_USUARIO</code> con el ID del usuario desde la tabla <code className="px-1 py-0.5 bg-muted rounded">auth.users</code>.
+                            </p>
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+
+                      <AccordionItem value="passport">
+                        <AccordionTrigger>¿Cómo funciona el sistema de pasaportes?</AccordionTrigger>
+                        <AccordionContent>
+                          <div className="space-y-3 text-sm text-muted-foreground">
+                            <p><strong className="text-foreground">Pasaporte de Bronce:</strong> Se obtiene al completar el registro con verificación de cédula y selfie.</p>
+                            <p><strong className="text-foreground">Pasaporte Dorado (Vía del Patrocinio):</strong> Se obtiene al donar RD$5,000 y ser aprobado por un administrador.</p>
+                            <p><strong className="text-foreground">Pasaporte Dorado (Vía del Esfuerzo):</strong> Se obtiene al reclutar 50 referidos validados.</p>
+                            <p><strong className="text-foreground">Nivel Campeón:</strong> Se alcanza al validar el voto el día de las elecciones.</p>
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+
+                      <AccordionItem value="votes">
+                        <AccordionTrigger>¿Cómo funciona la validación de votos?</AccordionTrigger>
+                        <AccordionContent>
+                          <div className="space-y-3 text-sm text-muted-foreground">
+                            <p>El día de las elecciones, los usuarios con Pasaporte Dorado pueden subir una selfie mostrando:</p>
+                            <ul className="list-disc list-inside space-y-1 ml-2">
+                              <li>Su dedo con la tinta electoral</li>
+                              <li>El centro electoral de fondo</li>
+                            </ul>
+                            <p>El sistema valida que la foto fue tomada en la fecha electoral configurada. Al validar, el usuario asciende a nivel "Campeón" y desbloquea acceso a las recompensas.</p>
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+
+                      <AccordionItem value="config">
+                        <AccordionTrigger>Configuración del día de elecciones</AccordionTrigger>
+                        <AccordionContent>
+                          <div className="space-y-3 text-sm text-muted-foreground">
+                            <p>La fecha de las elecciones se configura en el archivo:</p>
+                            <pre className="p-3 rounded-lg bg-muted font-mono text-xs overflow-x-auto">
+{`src/components/VoteValidationStep.tsx
+
+// Línea 15:
+const ELECTION_DATE = '2024-05-19';`}
+                            </pre>
+                            <p>Cambia esta fecha al día de las elecciones reales en formato <code className="px-1 py-0.5 bg-muted rounded">YYYY-MM-DD</code>.</p>
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+
+                      <AccordionItem value="bank">
+                        <AccordionTrigger>Configurar datos bancarios para donaciones</AccordionTrigger>
+                        <AccordionContent>
+                          <div className="space-y-3 text-sm text-muted-foreground">
+                            <p>Los datos bancarios se configuran en el archivo:</p>
+                            <pre className="p-3 rounded-lg bg-muted font-mono text-xs overflow-x-auto">
+{`src/components/DonationModule.tsx
+
+// Busca y edita estos campos:
+banco: 'NOMBRE DEL BANCO'
+cuenta: 'NÚMERO DE CUENTA'
+rnc: 'RNC DEL PARTIDO'`}
+                            </pre>
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Accordion>
+                  </CardContent>
+                </Card>
+
+                {/* Reset Data */}
+                <Card className="border-destructive/30">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-destructive">
+                      <Trash2 className="w-5 h-5" />
+                      Zona de Peligro
+                    </CardTitle>
+                    <CardDescription>
+                      Acciones irreversibles que afectan todos los datos
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="p-4 rounded-xl bg-destructive/10 border border-destructive/30 space-y-4">
+                      <div>
+                        <p className="font-bold text-foreground">Reiniciar Todos los Datos</p>
+                        <p className="text-sm text-muted-foreground">
+                          Elimina TODOS los registros, donaciones y datos de usuarios. Esta acción es irreversible y está diseñada para limpiar el sistema antes de un nuevo lanzamiento.
+                        </p>
+                      </div>
+                      <Button
+                        variant="destructive"
+                        onClick={() => setShowResetModal(true)}
+                      >
+                        <RefreshCw className="w-4 h-4 mr-2" />
+                        Reiniciar Sistema
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+          </Tabs>
         </motion.div>
       </div>
 
@@ -587,6 +905,61 @@ export default function Admin() {
                 </>
               ) : (
                 'Confirmar Rechazo'
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Reset Confirmation Modal */}
+      <Dialog open={showResetModal} onOpenChange={setShowResetModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="text-destructive flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5" />
+              ¡Advertencia! Acción Irreversible
+            </DialogTitle>
+            <DialogDescription>
+              Esta acción eliminará TODOS los registros, donaciones y datos de usuarios permanentemente.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <p className="text-sm text-muted-foreground">
+              Para confirmar, escribe <strong className="text-foreground">REINICIAR</strong> en el campo de abajo:
+            </p>
+            <Input
+              value={resetConfirmText}
+              onChange={(e) => setResetConfirmText(e.target.value)}
+              placeholder="Escribe REINICIAR para confirmar"
+              className="font-mono"
+            />
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowResetModal(false);
+                setResetConfirmText('');
+              }}
+              disabled={resetting}
+            >
+              Cancelar
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleResetAllData}
+              disabled={resetConfirmText !== 'REINICIAR' || resetting}
+            >
+              {resetting ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Reiniciando...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Confirmar Reinicio
+                </>
               )}
             </Button>
           </DialogFooter>
