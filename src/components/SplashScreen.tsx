@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { useEffect } from 'react';
 import finLogo from '@/assets/fin-logo.png';
+import { TotalRegisteredCounter } from './TotalRegisteredCounter';
 
 interface SplashScreenProps {
   onComplete: () => void;
@@ -105,9 +106,14 @@ export const SplashScreen = ({ onComplete }: SplashScreenProps) => {
           />
         </motion.div>
 
+        {/* Total Registered Counter */}
+        <div className="mt-8">
+          <TotalRegisteredCounter />
+        </div>
+
         {/* Loading indicator */}
         <motion.div
-          className="mt-8 flex gap-2"
+          className="mt-6 flex gap-2"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
