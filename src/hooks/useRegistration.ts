@@ -28,10 +28,12 @@ export interface RegistrationData {
 interface RegistrationState {
   currentStep: 'splash' | 'welcome' | 'motto' | 'glossary' | 'onboarding' | 'registration' | 'quick-verify' | 'staircase' | 'passport' | 'vote-validation' | 'golden-passport';
   staircaseStep: number;
+  forceShowBronze: boolean;
   data: RegistrationData;
   setStep: (step: RegistrationState['currentStep']) => void;
   setStaircaseStep: (step: number) => void;
   updateData: (data: Partial<RegistrationData>) => void;
+  setForceShowBronze: (force: boolean) => void;
   resetDemo: () => void;
 }
 
@@ -50,6 +52,7 @@ export const useRegistration = create<RegistrationState>()(
     (set) => ({
       currentStep: 'splash',
       staircaseStep: 1,
+      forceShowBronze: false,
       data: initialData,
       setStep: (step) => set({ currentStep: step }),
       setStaircaseStep: (step) => set({ staircaseStep: step }),
@@ -57,10 +60,12 @@ export const useRegistration = create<RegistrationState>()(
         set((state) => ({
           data: { ...state.data, ...newData },
         })),
+      setForceShowBronze: (force) => set({ forceShowBronze: force }),
       resetDemo: () =>
         set({
           currentStep: 'splash',
           staircaseStep: 1,
+          forceShowBronze: false,
           data: initialData,
         }),
     }),

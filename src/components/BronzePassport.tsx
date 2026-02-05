@@ -32,7 +32,7 @@ const areaLabels = {
 };
 
 export const BronzePassport = () => {
-  const { data, resetDemo, setStep, updateData } = useRegistration();
+  const { data, resetDemo, setStep, updateData, forceShowBronze, setForceShowBronze } = useRegistration();
   const { signOut } = useAuth();
   const navigate = useNavigate();
   const [showDonationModal, setShowDonationModal] = useState(false);
@@ -80,14 +80,14 @@ export const BronzePassport = () => {
           console.log('[BronzePassport] Passport level from DB:', registration.passport_level);
 
           // If passport is golden, redirect to golden passport
-          if (registration.passport_level === 'dorado') {
+          if (registration.passport_level === 'dorado' && !forceShowBronze) {
             console.log('[BronzePassport] Redirecting to golden-passport');
             setStep('golden-passport');
             return;
           }
 
           // If donation was approved, update local state
-          if (registration.donation_status === 'approved') {
+          if (registration.donation_status === 'approved' && !forceShowBronze) {
             updateData({ passportLevel: 'dorado' });
             setStep('golden-passport');
             return;
@@ -121,10 +121,12 @@ export const BronzePassport = () => {
   };
 
   const handleValidateVote = () => {
+    setForceShowBronze(false);
     setStep('vote-validation');
   };
 
   const handleBack = () => {
+    setForceShowBronze(false);
     setStep('staircase');
   };
 

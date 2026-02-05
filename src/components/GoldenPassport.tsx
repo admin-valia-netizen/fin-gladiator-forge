@@ -27,7 +27,7 @@ const areaLabels = {
 };
 
 export const GoldenPassport = () => {
-  const { data, resetDemo, setStep } = useRegistration();
+  const { data, resetDemo, setStep, setForceShowBronze } = useRegistration();
   const { signOut } = useAuth();
 
   const handleLogout = async () => {
@@ -36,6 +36,7 @@ export const GoldenPassport = () => {
   };
 
   const handleBack = () => {
+    setForceShowBronze(true);
     setStep('passport');
   };
 
