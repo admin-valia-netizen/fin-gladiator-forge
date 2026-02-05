@@ -69,7 +69,7 @@ export const GoldenPassport = () => {
       
       {/* Content */}
       <motion.div
-        className="relative z-10 flex-1 flex flex-col items-center justify-center max-w-md mx-auto"
+        className="relative z-10 flex-1 flex flex-col items-center max-w-md mx-auto w-full pt-4"
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5 }}
@@ -78,13 +78,13 @@ export const GoldenPassport = () => {
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          className="self-start mb-4"
+          className="w-full mb-6"
         >
           <Button
             variant="ghost"
             size="sm"
             onClick={handleBack}
-            className="text-muted-foreground hover:text-foreground"
+            className="text-muted-foreground hover:text-foreground hover:bg-muted/50"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Volver al Pasaporte de Bronce
