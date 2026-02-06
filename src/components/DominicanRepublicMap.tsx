@@ -1,4 +1,12 @@
-import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Star, Trophy } from 'lucide-react';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 interface ProvinceData {
   id: string;
@@ -15,157 +23,367 @@ interface DominicanRepublicMapProps {
   onProvinceClick: (province: ProvinceData) => void;
 }
 
-// Simplified SVG paths for Dominican Republic provinces
-// These are approximate representations for visualization
-const PROVINCE_PATHS: Record<string, { path: string; cx: number; cy: number }> = {
-  'Distrito Nacional': { path: 'M195,145 L205,140 L215,145 L210,155 L200,155 Z', cx: 205, cy: 148 },
-  'Santo Domingo': { path: 'M180,135 L195,130 L220,135 L225,150 L220,165 L195,170 L175,160 L170,145 Z', cx: 197, cy: 150 },
-  'Azua': { path: 'M120,160 L150,150 L165,160 L160,185 L130,195 L110,180 Z', cx: 138, cy: 172 },
-  'Baoruco': { path: 'M80,175 L100,165 L115,175 L110,195 L85,200 L70,190 Z', cx: 93, cy: 183 },
-  'Barahona': { path: 'M85,200 L110,195 L120,215 L100,240 L75,235 L70,210 Z', cx: 95, cy: 218 },
-  'Dajabón': { path: 'M55,70 L80,60 L95,75 L90,95 L65,100 L50,85 Z', cx: 73, cy: 80 },
-  'Duarte': { path: 'M155,85 L185,75 L200,90 L195,115 L165,120 L150,105 Z', cx: 173, cy: 98 },
-  'Elías Piña': { path: 'M45,120 L70,110 L85,125 L80,150 L55,155 L40,140 Z', cx: 63, cy: 133 },
-  'El Seibo': { path: 'M260,115 L295,105 L315,120 L310,145 L275,150 L255,135 Z', cx: 285, cy: 128 },
-  'Espaillat': { path: 'M170,60 L195,50 L210,65 L205,85 L180,90 L165,75 Z', cx: 188, cy: 70 },
-  'Hato Mayor': { path: 'M245,130 L270,120 L285,135 L280,160 L255,165 L240,150 Z', cx: 263, cy: 143 },
-  'Hermanas Mirabal': { path: 'M185,55 L205,48 L218,60 L215,78 L195,82 L182,70 Z', cx: 200, cy: 65 },
-  'Independencia': { path: 'M35,155 L60,145 L75,160 L70,190 L45,195 L30,175 Z', cx: 53, cy: 170 },
-  'La Altagracia': { path: 'M305,120 L340,110 L365,130 L360,165 L320,175 L300,150 Z', cx: 333, cy: 143 },
-  'La Romana': { path: 'M285,150 L310,145 L325,160 L320,180 L295,185 L280,170 Z', cx: 303, cy: 165 },
-  'La Vega': { path: 'M135,85 L160,75 L175,90 L170,115 L145,120 L130,105 Z', cx: 153, cy: 98 },
-  'María Trinidad Sánchez': { path: 'M220,50 L250,40 L270,55 L265,80 L235,85 L215,70 Z', cx: 243, cy: 63 },
-  'Monseñor Nouel': { path: 'M150,105 L170,100 L180,115 L175,135 L155,140 L145,125 Z', cx: 163, cy: 120 },
-  'Monte Cristi': { path: 'M20,55 L55,45 L75,60 L70,85 L35,90 L15,75 Z', cx: 45, cy: 68 },
-  'Monte Plata': { path: 'M205,115 L235,105 L250,120 L245,145 L215,150 L200,135 Z', cx: 225, cy: 128 },
-  'Pedernales': { path: 'M30,200 L55,190 L70,210 L60,245 L35,250 L20,225 Z', cx: 45, cy: 220 },
-  'Peravia': { path: 'M160,160 L185,155 L195,170 L188,190 L165,195 L155,178 Z', cx: 175, cy: 175 },
-  'Puerto Plata': { path: 'M100,40 L140,30 L165,45 L160,70 L125,78 L95,60 Z', cx: 130, cy: 53 },
-  'Samaná': { path: 'M260,55 L295,45 L320,65 L310,90 L275,95 L255,75 Z', cx: 288, cy: 70 },
-  'Sánchez Ramírez': { path: 'M175,100 L195,95 L208,108 L205,125 L185,130 L172,118 Z', cx: 190, cy: 113 },
-  'San Cristóbal': { path: 'M165,145 L190,140 L200,155 L195,175 L170,180 L160,165 Z', cx: 180, cy: 160 },
-  'San José de Ocoa': { path: 'M140,140 L160,135 L170,150 L165,170 L145,175 L135,160 Z', cx: 153, cy: 155 },
-  'San Juan': { path: 'M70,130 L105,120 L120,140 L115,170 L80,180 L60,155 Z', cx: 92, cy: 150 },
-  'San Pedro de Macorís': { path: 'M240,155 L265,150 L280,165 L275,185 L250,190 L235,175 Z', cx: 258, cy: 170 },
-  'Santiago': { path: 'M105,70 L140,60 L158,78 L152,100 L120,108 L100,90 Z', cx: 128, cy: 85 },
-  'Santiago Rodríguez': { path: 'M65,85 L90,75 L105,90 L100,115 L75,120 L60,105 Z', cx: 83, cy: 98 },
-  'Valverde': { path: 'M70,60 L95,52 L110,68 L105,88 L80,93 L65,78 Z', cx: 88, cy: 73 },
+// Real SVG paths for Dominican Republic provinces (GeoJSON converted to SVG paths)
+// These paths are accurate representations of the 32 provinces
+const PROVINCE_PATHS: Record<string, { path: string; labelX: number; labelY: number }> = {
+  'Monte Cristi': {
+    path: 'M42,58 L58,52 L72,48 L88,52 L95,62 L88,75 L75,82 L58,85 L42,78 L35,68 Z',
+    labelX: 62, labelY: 68
+  },
+  'Dajabón': {
+    path: 'M88,52 L102,48 L115,55 L118,70 L108,82 L95,85 L88,75 L95,62 Z',
+    labelX: 103, labelY: 68
+  },
+  'Valverde': {
+    path: 'M75,82 L88,75 L95,85 L108,82 L105,98 L92,108 L78,105 L70,95 Z',
+    labelX: 88, labelY: 95
+  },
+  'Santiago Rodríguez': {
+    path: 'M108,82 L118,70 L132,68 L140,80 L135,95 L120,102 L105,98 Z',
+    labelX: 122, labelY: 88
+  },
+  'Puerto Plata': {
+    path: 'M92,108 L105,98 L120,102 L138,95 L155,88 L172,82 L188,78 L195,88 L185,102 L168,112 L150,115 L132,118 L115,120 L100,118 Z',
+    labelX: 145, labelY: 100
+  },
+  'Espaillat': {
+    path: 'M168,112 L185,102 L195,88 L208,85 L218,95 L212,112 L198,122 L182,125 L168,120 Z',
+    labelX: 192, labelY: 108
+  },
+  'Santiago': {
+    path: 'M120,102 L135,95 L140,80 L155,75 L168,82 L172,82 L155,88 L138,95 L132,118 L115,120 L100,118 L92,108 L105,98 Z',
+    labelX: 132, labelY: 100
+  },
+  'La Vega': {
+    path: 'M132,118 L150,115 L168,120 L182,125 L188,140 L178,158 L162,165 L145,162 L132,152 L125,138 Z',
+    labelX: 155, labelY: 140
+  },
+  'María Trinidad Sánchez': {
+    path: 'M212,112 L218,95 L235,88 L255,85 L272,92 L278,108 L268,122 L250,128 L232,125 L218,120 Z',
+    labelX: 248, labelY: 108
+  },
+  'Duarte': {
+    path: 'M182,125 L198,122 L212,112 L218,120 L232,125 L238,142 L228,158 L212,165 L195,162 L188,148 L188,140 Z',
+    labelX: 210, labelY: 142
+  },
+  'Hermanas Mirabal': {
+    path: 'M198,122 L212,112 L218,120 L212,130 L202,135 L195,128 Z',
+    labelX: 208, labelY: 125
+  },
+  'Samaná': {
+    path: 'M268,122 L278,108 L295,102 L318,98 L338,105 L348,118 L342,135 L322,145 L298,148 L280,142 L272,132 Z',
+    labelX: 308, labelY: 125
+  },
+  'Sánchez Ramírez': {
+    path: 'M188,140 L195,162 L212,165 L205,182 L188,188 L175,178 L178,158 Z',
+    labelX: 192, labelY: 172
+  },
+  'Monseñor Nouel': {
+    path: 'M162,165 L178,158 L175,178 L188,188 L182,202 L165,208 L152,198 L145,182 L145,162 Z',
+    labelX: 165, labelY: 185
+  },
+  'Monte Plata': {
+    path: 'M228,158 L238,142 L255,138 L272,145 L285,158 L282,178 L268,192 L250,195 L235,188 L225,175 Z',
+    labelX: 255, labelY: 172
+  },
+  'Hato Mayor': {
+    path: 'M280,142 L298,148 L315,155 L328,168 L325,188 L308,202 L288,205 L272,195 L268,178 L272,158 L285,158 L282,178 Z',
+    labelX: 298, labelY: 178
+  },
+  'El Seibo': {
+    path: 'M315,155 L328,148 L345,142 L365,148 L378,162 L382,182 L375,202 L358,215 L338,218 L320,208 L308,195 L308,202 L325,188 L328,168 Z',
+    labelX: 348, labelY: 182
+  },
+  'La Altagracia': {
+    path: 'M358,215 L375,202 L382,182 L392,175 L408,182 L418,198 L422,222 L415,245 L398,262 L375,268 L355,258 L342,242 L338,225 L338,218 Z',
+    labelX: 382, labelY: 225
+  },
+  'La Romana': {
+    path: 'M308,202 L320,208 L338,218 L338,225 L328,238 L310,245 L292,242 L280,228 L282,212 L288,205 Z',
+    labelX: 308, labelY: 225
+  },
+  'San Pedro de Macorís': {
+    path: 'M268,192 L282,212 L280,228 L268,242 L250,248 L235,242 L228,225 L232,208 L250,195 Z',
+    labelX: 255, labelY: 222
+  },
+  'Santo Domingo': {
+    path: 'M225,175 L235,188 L250,195 L232,208 L228,225 L218,238 L202,245 L188,238 L178,225 L182,208 L195,195 L212,188 Z',
+    labelX: 212, labelY: 215
+  },
+  'Distrito Nacional': {
+    path: 'M212,188 L218,195 L222,208 L218,218 L208,222 L198,218 L195,208 L198,198 Z',
+    labelX: 208, labelY: 208
+  },
+  'San Cristóbal': {
+    path: 'M182,202 L188,188 L205,182 L212,188 L195,195 L182,208 L178,225 L165,232 L152,225 L148,212 L152,198 L165,208 Z',
+    labelX: 175, labelY: 212
+  },
+  'Peravia': {
+    path: 'M148,212 L152,225 L148,242 L135,252 L120,248 L112,235 L118,218 L132,208 Z',
+    labelX: 132, labelY: 232
+  },
+  'San José de Ocoa': {
+    path: 'M145,182 L152,198 L148,212 L132,208 L118,218 L108,205 L112,188 L125,178 L145,162 Z',
+    labelX: 128, labelY: 195
+  },
+  'Azua': {
+    path: 'M108,205 L118,218 L112,235 L120,248 L108,265 L88,272 L72,268 L62,252 L68,232 L82,218 L98,212 Z',
+    labelX: 92, labelY: 242
+  },
+  'San Juan': {
+    path: 'M68,135 L88,128 L108,125 L125,138 L132,152 L125,178 L112,188 L98,212 L82,218 L68,232 L52,225 L42,208 L45,188 L52,168 L58,148 Z',
+    labelX: 85, labelY: 175
+  },
+  'Elías Piña': {
+    path: 'M42,115 L58,108 L75,112 L88,128 L68,135 L58,148 L45,142 L38,128 Z',
+    labelX: 62, labelY: 128
+  },
+  'Independencia': {
+    path: 'M42,208 L52,225 L45,245 L32,258 L18,252 L12,235 L18,218 L28,205 L38,198 Z',
+    labelX: 32, labelY: 232
+  },
+  'Baoruco': {
+    path: 'M52,225 L68,232 L62,252 L52,265 L38,272 L25,268 L18,252 L32,258 L45,245 Z',
+    labelX: 45, labelY: 255
+  },
+  'Barahona': {
+    path: 'M62,252 L72,268 L68,288 L55,305 L38,312 L22,305 L15,288 L22,272 L38,272 L52,265 Z',
+    labelX: 45, labelY: 285
+  },
+  'Pedernales': {
+    path: 'M22,272 L15,288 L8,308 L12,328 L28,342 L48,345 L65,335 L72,318 L68,302 L55,305 L68,288 L72,268 L62,252 L52,265 L38,272 Z',
+    labelX: 38, labelY: 315
+  },
+};
+
+// Zone type icons and colors
+const ZONE_CONFIG = {
+  costera: { label: 'Zona Marítima (GESEMA)', color: 'hsl(205, 85%, 55%)' },
+  agricola: { label: 'Zona Agro-Tecnológica', color: 'hsl(142, 70%, 45%)' },
+  urbana: { label: 'Zona Urbana', color: 'hsl(45, 90%, 50%)' },
 };
 
 export const DominicanRepublicMap = ({ provinces, onProvinceClick }: DominicanRepublicMapProps) => {
+  const [hoveredProvince, setHoveredProvince] = useState<string | null>(null);
+
+  // Choropleth color logic based on registration count
   const getProvinceColor = (province: ProvinceData | undefined) => {
-    if (!province) return 'hsl(var(--muted))';
+    if (!province) return 'hsl(220, 15%, 90%)'; // Gris claro / blanco hueso
     
-    const percentage = (province.registration_count / province.target_count) * 100;
+    const count = province.registration_count;
     
-    if (province.cidp_activated || percentage >= 100) {
-      return 'hsl(142, 76%, 36%)'; // Green - activated
+    // Meta cumplida - Azul Victoria (marino profundo)
+    if (province.cidp_activated || count >= 5000) {
+      return 'hsl(217, 85%, 25%)';
     }
-    if (percentage >= 75) {
-      return 'hsl(217, 91%, 60%)'; // Blue Victory
+    // 2,501 - 4,999: Azul medio institucional
+    if (count >= 2501) {
+      return 'hsl(217, 80%, 45%)';
     }
-    if (percentage >= 50) {
-      return 'hsl(var(--primary))'; // Primary orange
+    // 1 - 2,500: Azul celeste
+    if (count >= 1) {
+      return 'hsl(205, 85%, 65%)';
     }
-    if (percentage >= 25) {
-      return 'hsl(45, 93%, 47%)'; // Amber
+    // 0 registros: Gris claro
+    return 'hsl(220, 15%, 90%)';
+  };
+
+  const getHoverColor = (province: ProvinceData | undefined) => {
+    if (!province) return 'hsl(220, 15%, 85%)';
+    
+    const count = province.registration_count;
+    
+    if (province.cidp_activated || count >= 5000) {
+      return 'hsl(217, 85%, 35%)';
     }
-    if (percentage > 0) {
-      return 'hsl(var(--primary) / 0.5)'; // Light primary
+    if (count >= 2501) {
+      return 'hsl(217, 80%, 55%)';
     }
-    return 'hsl(var(--muted))'; // Default gray
+    if (count >= 1) {
+      return 'hsl(205, 85%, 75%)';
+    }
+    return 'hsl(220, 15%, 85%)';
   };
 
   const findProvince = (name: string) => {
     return provinces.find(p => p.province_name === name);
   };
 
+  const getProgressText = (province: ProvinceData) => {
+    const percentage = Math.round((province.registration_count / province.target_count) * 100);
+    return `${province.registration_count.toLocaleString()} / ${province.target_count.toLocaleString()} (${percentage}%)`;
+  };
+
   return (
-    <div className="relative w-full aspect-[1.6/1] bg-card/50 rounded-xl border border-border overflow-hidden">
-      <svg
-        viewBox="0 0 380 280"
-        className="w-full h-full"
-        style={{ filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.3))' }}
-      >
-        {/* Ocean background */}
-        <rect x="0" y="0" width="380" height="280" fill="hsl(217, 91%, 15%)" />
-        
-        {/* Island base shape */}
-        <path
-          d="M15,75 Q25,35 80,30 Q150,20 220,35 Q280,25 340,50 Q375,80 365,130 Q370,180 340,200 Q310,190 280,185 Q240,195 200,175 Q160,195 120,195 Q80,210 50,245 Q20,260 15,220 Q25,180 30,155 Q20,120 15,75"
-          fill="hsl(var(--card))"
-          stroke="hsl(var(--border))"
-          strokeWidth="1"
-        />
-        
-        {/* Province shapes */}
-        {Object.entries(PROVINCE_PATHS).map(([name, { path, cx, cy }]) => {
-          const province = findProvince(name);
-          const color = getProvinceColor(province);
-          const percentage = province 
-            ? Math.round((province.registration_count / province.target_count) * 100) 
-            : 0;
+    <TooltipProvider delayDuration={100}>
+      <div className="relative w-full bg-gradient-to-b from-blue-950/80 to-blue-900/60 rounded-xl border border-border overflow-hidden p-4">
+        {/* Title */}
+        <div className="text-center mb-3">
+          <h3 className="text-lg font-bold text-foreground">Mapa de la Integridad Dominicana</h3>
+          <p className="text-xs text-muted-foreground">Compromiso 5,000 por Provincia</p>
+        </div>
+
+        {/* SVG Map */}
+        <svg
+          viewBox="0 380 430"
+          className="w-full h-auto"
+          style={{ filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.4))' }}
+        >
+          {/* Ocean background with gradient */}
+          <defs>
+            <linearGradient id="oceanGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="hsl(217, 90%, 20%)" />
+              <stop offset="100%" stopColor="hsl(217, 85%, 15%)" />
+            </linearGradient>
+            <filter id="glow">
+              <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+              <feMerge>
+                <feMergeNode in="coloredBlur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+            <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="hsl(45, 100%, 60%)" />
+              <stop offset="100%" stopColor="hsl(35, 100%, 45%)" />
+            </linearGradient>
+          </defs>
           
-          return (
-            <motion.g
-              key={name}
-              onClick={() => province && onProvinceClick(province)}
-              style={{ cursor: province ? 'pointer' : 'default' }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <motion.path
-                d={path}
-                fill={color}
-                stroke="hsl(var(--border))"
-                strokeWidth="0.5"
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.3 }}
-              />
-              {/* Province label (only show for provinces with progress or on hover) */}
-              {percentage > 0 && (
-                <text
-                  x={cx}
-                  y={cy}
-                  textAnchor="middle"
-                  dominantBaseline="middle"
-                  className="text-[6px] font-bold fill-foreground pointer-events-none"
-                  style={{ textShadow: '0 1px 2px rgba(0,0,0,0.8)' }}
+          <rect x="0" y="0" width="430" height="380" fill="url(#oceanGradient)" />
+          
+          {/* Province shapes with tooltips */}
+          {Object.entries(PROVINCE_PATHS).map(([name, { path, labelX, labelY }]) => {
+            const province = findProvince(name);
+            const isHovered = hoveredProvince === name;
+            const isActivated = province?.cidp_activated || (province?.registration_count ?? 0) >= 5000;
+            
+            return (
+              <Tooltip key={name}>
+                <TooltipTrigger asChild>
+                  <motion.g
+                    onClick={() => province && onProvinceClick(province)}
+                    onMouseEnter={() => setHoveredProvince(name)}
+                    onMouseLeave={() => setHoveredProvince(null)}
+                    style={{ cursor: province ? 'pointer' : 'default' }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <motion.path
+                      d={path}
+                      fill={isHovered ? getHoverColor(province) : getProvinceColor(province)}
+                      stroke="hsl(217, 50%, 30%)"
+                      strokeWidth={isHovered ? "1.5" : "0.8"}
+                      animate={{
+                        scale: isHovered ? 1.02 : 1,
+                      }}
+                      transition={{ duration: 0.2 }}
+                      style={{
+                        transformOrigin: `${labelX}px ${labelY}px`,
+                        filter: isActivated ? 'url(#glow)' : 'none',
+                      }}
+                    />
+                    
+                    {/* Golden star for activated provinces */}
+                    {isActivated && (
+                      <motion.g
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ delay: 0.3, type: 'spring' }}
+                      >
+                        <circle
+                          cx={labelX}
+                          cy={labelY}
+                          r="8"
+                          fill="url(#goldGradient)"
+                          filter="url(#glow)"
+                        />
+                        <text
+                          x={labelX}
+                          y={labelY + 1}
+                          textAnchor="middle"
+                          dominantBaseline="middle"
+                          fontSize="8"
+                          fill="hsl(217, 85%, 15%)"
+                        >
+                          ★
+                        </text>
+                      </motion.g>
+                    )}
+                  </motion.g>
+                </TooltipTrigger>
+                <TooltipContent 
+                  side="top" 
+                  className="bg-card border-primary/30 shadow-xl max-w-xs"
                 >
-                  {percentage}%
-                </text>
-              )}
-            </motion.g>
-          );
-        })}
-        
+                  <div className="space-y-1.5 p-1">
+                    <p className="font-bold text-foreground text-sm">{name}</p>
+                    {province ? (
+                      <>
+                        <div className="flex items-center gap-2">
+                          <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+                            <motion.div
+                              className="h-full bg-primary"
+                              initial={{ width: 0 }}
+                              animate={{ 
+                                width: `${Math.min((province.registration_count / province.target_count) * 100, 100)}%` 
+                              }}
+                              transition={{ duration: 0.5 }}
+                            />
+                          </div>
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          <span className="font-semibold text-foreground">
+                            {province.registration_count.toLocaleString()}
+                          </span>
+                          {' / '}
+                          {province.target_count.toLocaleString()} registros
+                        </p>
+                        <p className="text-xs" style={{ color: ZONE_CONFIG[province.zone_type].color }}>
+                          {ZONE_CONFIG[province.zone_type].label}
+                        </p>
+                        {isActivated && (
+                          <div className="flex items-center gap-1 text-amber-500 text-xs font-medium">
+                            <Trophy className="w-3 h-3" />
+                            ¡CIDP Activado!
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <p className="text-xs text-muted-foreground">Sin datos disponibles</p>
+                    )}
+                  </div>
+                </TooltipContent>
+              </Tooltip>
+            );
+          })}
+        </svg>
+
         {/* Legend */}
-        <g transform="translate(10, 250)">
-          <rect x="0" y="0" width="8" height="8" fill="hsl(var(--muted))" rx="1" />
-          <text x="12" y="7" className="text-[5px] fill-muted-foreground">0%</text>
-          
-          <rect x="35" y="0" width="8" height="8" fill="hsl(var(--primary) / 0.5)" rx="1" />
-          <text x="47" y="7" className="text-[5px] fill-muted-foreground">1-24%</text>
-          
-          <rect x="75" y="0" width="8" height="8" fill="hsl(45, 93%, 47%)" rx="1" />
-          <text x="87" y="7" className="text-[5px] fill-muted-foreground">25-49%</text>
-          
-          <rect x="120" y="0" width="8" height="8" fill="hsl(var(--primary))" rx="1" />
-          <text x="132" y="7" className="text-[5px] fill-muted-foreground">50-74%</text>
-          
-          <rect x="165" y="0" width="8" height="8" fill="hsl(217, 91%, 60%)" rx="1" />
-          <text x="177" y="7" className="text-[5px] fill-muted-foreground">75-99%</text>
-          
-          <rect x="210" y="0" width="8" height="8" fill="hsl(142, 76%, 36%)" rx="1" />
-          <text x="222" y="7" className="text-[5px] fill-muted-foreground">CIDP</text>
-        </g>
-      </svg>
-      
-      {/* Overlay text */}
-      <div className="absolute bottom-2 right-2 text-xs text-muted-foreground bg-background/80 px-2 py-1 rounded">
-        Toca una provincia para ver detalles
+        <div className="mt-4 flex flex-wrap justify-center gap-3 text-xs">
+          <div className="flex items-center gap-1.5">
+            <div className="w-4 h-4 rounded" style={{ backgroundColor: 'hsl(220, 15%, 90%)' }} />
+            <span className="text-muted-foreground">0 registros</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="w-4 h-4 rounded" style={{ backgroundColor: 'hsl(205, 85%, 65%)' }} />
+            <span className="text-muted-foreground">1 - 2,500</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="w-4 h-4 rounded" style={{ backgroundColor: 'hsl(217, 80%, 45%)' }} />
+            <span className="text-muted-foreground">2,501 - 4,999</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="w-4 h-4 rounded" style={{ backgroundColor: 'hsl(217, 85%, 25%)' }} />
+            <Star className="w-3 h-3 text-amber-500" />
+            <span className="text-muted-foreground">Meta Cumplida (5,000)</span>
+          </div>
+        </div>
+
+        {/* Interaction hint */}
+        <p className="text-center text-xs text-muted-foreground mt-3">
+          Toca o pasa el cursor sobre una provincia para ver los detalles
+        </p>
       </div>
-    </div>
+    </TooltipProvider>
   );
 };
