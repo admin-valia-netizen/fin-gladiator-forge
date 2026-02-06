@@ -111,6 +111,18 @@ export const SplashScreen = ({ onComplete }: SplashScreenProps) => {
           <TotalRegisteredCounter />
         </div>
 
+        {/* Welcome message */}
+        <motion.p
+          className="mt-6 text-center text-sm text-muted-foreground max-w-xs px-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.5, duration: 1 }}
+        >
+          Tu participación es la mayor{' '}
+          <span className="text-primary font-semibold">recompensa</span>{' '}
+          para el futuro de nuestra patria
+        </motion.p>
+
         {/* Loading indicator */}
         <motion.div
           className="mt-6 flex gap-2"

@@ -1,24 +1,29 @@
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, Check, X, Loader2, RefreshCw, AlertCircle, ScanLine } from 'lucide-react';
+import { Camera, Check, X, Loader2, RefreshCw, AlertCircle, ScanLine, MapPin, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { extractCedulaFromImage, compareCedulas, preprocessImage } from '@/lib/ocrService';
+import { supabase } from '@/integrations/supabase/client';
 
 interface CedulaOCRValidatorProps {
   userCedula: string;
-  onValidationComplete: (isValid: boolean, extractedCedula?: string) => void;
+  registrationId?: string;
+  onValidationComplete: (isValid: boolean, extractedCedula?: string, provincia?: string) => void;
   onSkip?: () => void;
 }
 
 export const CedulaOCRValidator = ({
   userCedula,
+  registrationId,
   onValidationComplete,
   onSkip,
 }: CedulaOCRValidatorProps) => {
   const [status, setStatus] = useState<'idle' | 'capturing' | 'processing' | 'success' | 'error'>('idle');
   const [progress, setProgress] = useState(0);
   const [extractedCedula, setExtractedCedula] = useState<string | null>(null);
+  const [extractedName, setExtractedName] = useState<string | null>(null);
+  const [extractedProvincia, setExtractedProvincia] = useState<string | null>(null);
   const [similarity, setSimilarity] = useState<number>(0);
   const [retryCount, setRetryCount] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -57,6 +62,8 @@ export const CedulaOCRValidator = ({
 
       if (result.success && result.cedula) {
         setExtractedCedula(result.cedula);
+        setExtractedName(result.fullName || null);
+        setExtractedProvincia(result.provincia || null);
 
         // Compare with user's cédula (allow 1 digit tolerance for OCR errors)
         const comparison = compareCedulas(result.cedula, userCedula, 1);
@@ -66,10 +73,24 @@ export const CedulaOCRValidator = ({
           setStatus('success');
           toast.success('¡Cédula verificada correctamente!');
           
+          // Update registration with detected province
+          if (registrationId && result.provincia) {
+            try {
+              await supabase
+                .from('registrations')
+                .update({ provincia: result.provincia })
+                .eq('id', registrationId);
+              
+              toast.success(`Provincia detectada: ${result.provincia}`);
+            } catch (error) {
+              console.error('Error updating province:', error);
+            }
+          }
+          
           // Auto-complete after showing success
           setTimeout(() => {
-            onValidationComplete(true, result.cedula);
-          }, 1500);
+            onValidationComplete(true, result.cedula, result.provincia);
+          }, 2000);
         } else {
           setStatus('error');
           
@@ -81,6 +102,8 @@ export const CedulaOCRValidator = ({
         }
       } else {
         setStatus('error');
+        setExtractedName(result.fullName || null);
+        setExtractedProvincia(result.provincia || null);
         toast.error(result.error || 'No se pudo leer la cédula. Intenta con mejor iluminación.');
       }
     } catch (error) {
@@ -99,6 +122,8 @@ export const CedulaOCRValidator = ({
     setStatus('idle');
     setProgress(0);
     setExtractedCedula(null);
+    setExtractedName(null);
+    setExtractedProvincia(null);
     setSimilarity(0);
     setRetryCount(prev => prev + 1);
   };
@@ -215,7 +240,7 @@ export const CedulaOCRValidator = ({
 
             <p className="text-foreground font-bold mb-2">Analizando imagen...</p>
             <p className="text-sm text-muted-foreground mb-4">
-              Extrayendo texto de tu cédula
+              Extrayendo datos de tu cédula
             </p>
 
             {/* Progress bar */}
@@ -253,14 +278,36 @@ export const CedulaOCRValidator = ({
               Tu identidad ha sido confirmada
             </p>
 
-            {extractedCedula && (
-              <div className="bg-muted/30 rounded-lg p-3">
-                <p className="text-xs text-muted-foreground">Cédula detectada:</p>
-                <p className="font-mono text-foreground font-bold">
-                  {extractedCedula.replace(/(\d{3})(\d{7})(\d{1})/, '$1-$2-$3')}
-                </p>
-              </div>
-            )}
+            <div className="space-y-3">
+              {extractedCedula && (
+                <div className="bg-muted/30 rounded-lg p-3">
+                  <p className="text-xs text-muted-foreground">Cédula detectada:</p>
+                  <p className="font-mono text-foreground font-bold">
+                    {extractedCedula.replace(/(\d{3})(\d{7})(\d{1})/, '$1-$2-$3')}
+                  </p>
+                </div>
+              )}
+              
+              {extractedName && (
+                <div className="bg-muted/30 rounded-lg p-3 flex items-center gap-2">
+                  <User className="w-4 h-4 text-primary shrink-0" />
+                  <div className="text-left">
+                    <p className="text-xs text-muted-foreground">Nombre detectado:</p>
+                    <p className="text-sm text-foreground font-medium">{extractedName}</p>
+                  </div>
+                </div>
+              )}
+              
+              {extractedProvincia && (
+                <div className="bg-primary/10 rounded-lg p-3 flex items-center gap-2 border border-primary/30">
+                  <MapPin className="w-4 h-4 text-primary shrink-0" />
+                  <div className="text-left">
+                    <p className="text-xs text-muted-foreground">Provincia detectada:</p>
+                    <p className="text-sm text-primary font-bold">{extractedProvincia}</p>
+                  </div>
+                </div>
+              )}
+            </div>
           </motion.div>
         )}
 
@@ -308,6 +355,25 @@ export const CedulaOCRValidator = ({
                   <p className="text-xs text-muted-foreground">
                     Similitud: {similarity.toFixed(0)}%
                   </p>
+                  
+                  {/* Show extracted data even on error */}
+                  {(extractedName || extractedProvincia) && (
+                    <div className="border-t border-border pt-3 mt-3 space-y-2">
+                      <p className="text-xs text-muted-foreground">Otros datos detectados:</p>
+                      {extractedName && (
+                        <div className="flex items-center gap-2 text-xs">
+                          <User className="w-3 h-3 text-muted-foreground" />
+                          <span className="text-foreground">{extractedName}</span>
+                        </div>
+                      )}
+                      {extractedProvincia && (
+                        <div className="flex items-center gap-2 text-xs">
+                          <MapPin className="w-3 h-3 text-muted-foreground" />
+                          <span className="text-foreground">{extractedProvincia}</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               ) : (
                 <p className="text-sm text-muted-foreground">
