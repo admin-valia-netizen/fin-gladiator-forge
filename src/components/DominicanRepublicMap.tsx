@@ -107,14 +107,17 @@ export const DominicanRepublicMap = ({ provinces, onProvinceClick }: DominicanRe
   const tooltipMaxLeft = (containerRef.current?.clientWidth ?? 0) - 220;
 
   return (
-    <div ref={containerRef} className="relative w-full overflow-hidden rounded-xl bg-[hsl(220,50%,8%)] border border-white/10">
+    <div ref={containerRef} className="relative w-full overflow-hidden rounded-xl bg-background border border-border">
       <ComposableMap
         projection="geoMercator"
-        projectionConfig={{ center: [-70.4, 18.9], scale: 12000 }}
+        projectionConfig={{ center: [-70.4, 18.9], scale: 11200 }}
         width={800}
-        height={520}
+        height={480}
         className="w-full h-auto"
-        style={{ maxHeight: "60vh", background: "linear-gradient(180deg, hsl(220 50% 6%) 0%, hsl(220 60% 4%) 100%)" }}
+        style={{
+          maxHeight: "52vh",
+          background: "linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--card)) 100%)",
+        }}
         role="img"
         aria-label="Mapa provincial de la República Dominicana"
       >
@@ -160,10 +163,14 @@ export const DominicanRepublicMap = ({ provinces, onProvinceClick }: DominicanRe
                     }
                     style={{
                       default: { fill, outline: "none" },
-                      hover: { fill, outline: "none", filter: "brightness(1.25) drop-shadow(0 0 8px rgba(255,255,255,0.3))" },
+                      hover: {
+                        fill,
+                        outline: "none",
+                        filter: "brightness(1.25) drop-shadow(0 0 8px hsl(var(--foreground) / 0.35))",
+                      },
                       pressed: { fill, outline: "none" },
                     }}
-                    stroke="rgba(255,255,255,0.5)"
+                    stroke="hsl(var(--foreground) / 0.55)"
                     strokeWidth={isHovered ? 1.2 : 0.6}
                     opacity={province ? 1 : 0.95}
                   />
@@ -182,15 +189,11 @@ export const DominicanRepublicMap = ({ provinces, onProvinceClick }: DominicanRe
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 6 }}
             transition={{ duration: 0.15 }}
-            className="pointer-events-none absolute z-20 rounded-lg border border-border bg-card px-3 py-2 shadow-lg"
-            style={{
-              left: Math.min(tooltip.x + 12, Math.max(8, tooltipMaxLeft)),
-              top: Math.max(tooltip.y - 12, 8),
-            }}
+            className="pointer-events-none absolute inset-x-3 bottom-3 z-20 rounded-xl border border-border bg-card/90 backdrop-blur px-4 py-3 shadow-lg"
           >
-            <p className="text-sm font-bold text-foreground">{tooltip.geoName}</p>
+            <p className="text-lg font-extrabold text-foreground leading-tight">{tooltip.geoName}</p>
             {tooltip.province && (
-              <p className="text-xs text-muted-foreground">
+              <p className="text-sm text-muted-foreground">
                 {tooltip.province.registration_count.toLocaleString()} / {tooltip.province.target_count.toLocaleString()} registros
               </p>
             )}
