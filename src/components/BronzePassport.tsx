@@ -184,7 +184,7 @@ export const BronzePassport = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col p-6">
+    <div className="min-h-screen bg-background flex flex-col p-4 pb-8">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-carbon" />
       
@@ -225,56 +225,56 @@ export const BronzePassport = () => {
           <p className="text-muted-foreground">Tu Pasaporte de Bronce está listo</p>
         </motion.div>
 
-        {/* Passport card */}
+        {/* Passport card - compact */}
         <motion.div
-          className="w-full card-industrial rounded-2xl overflow-hidden border border-bronze/30"
+          className="w-full card-industrial rounded-xl overflow-hidden border border-bronze/30"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
         >
-          {/* Header */}
-          <div className="bg-gradient-bronze p-4">
+          {/* Header - compact */}
+          <div className="bg-gradient-bronze p-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Shield className="w-8 h-8 text-foreground" />
-                <span className="font-bold text-lg text-foreground">FIN</span>
+                <Shield className="w-6 h-6 text-foreground" />
+                <span className="font-bold text-foreground">FIN</span>
               </div>
               <div className="text-right">
-                <p className="text-xs text-foreground/70">NIVEL</p>
-                <p className="font-bold text-foreground uppercase">{data.userLevel}</p>
+                <p className="text-[10px] text-foreground/70">NIVEL</p>
+                <p className="font-bold text-sm text-foreground uppercase">{data.userLevel}</p>
               </div>
             </div>
           </div>
 
-          {/* Body */}
-          <div className="p-6 space-y-6">
+          {/* Body - compact */}
+          <div className="p-4 space-y-4">
             {/* User info */}
-            <div className="flex gap-4">
-              <div className="flex-1">
-                <p className="text-xs text-muted-foreground mb-1">NOMBRE</p>
-                <p className="font-bold text-foreground">{data.fullName}</p>
+            <div className="flex gap-3 items-center">
+              <div className="flex-1 min-w-0">
+                <p className="text-[10px] text-muted-foreground mb-0.5">NOMBRE</p>
+                <p className="font-bold text-sm text-foreground truncate">{data.fullName}</p>
               </div>
               {data.interestArea && (
-                <div className="flex items-center gap-2 px-3 py-1 bg-primary/10 rounded-full border border-primary/30">
+                <div className="flex items-center gap-1.5 px-2 py-1 bg-primary/10 rounded-full border border-primary/30 shrink-0">
                   {areaIcons[data.interestArea]}
-                  <span className="text-xs font-medium text-primary">
+                  <span className="text-[10px] font-medium text-primary">
                     {areaLabels[data.interestArea]}
                   </span>
                 </div>
               )}
             </div>
 
-            {/* QR Code */}
+            {/* QR Code - smaller */}
             <div className="flex justify-center">
               <motion.div
-                className="p-4 bg-foreground rounded-xl"
+                className="p-3 bg-foreground rounded-lg"
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.5, type: 'spring' }}
               >
                 <QRCodeSVG
                   value={data.qrCode || `FIN-${data.cedula}`}
-                  size={150}
+                  size={120}
                   level="H"
                   includeMargin={false}
                   fgColor="#0a0a0a"
@@ -285,7 +285,7 @@ export const BronzePassport = () => {
 
             {/* QR Code label */}
             <div className="text-center">
-              <p className="text-xs text-muted-foreground font-mono">
+              <p className="text-[10px] text-muted-foreground font-mono">
                 {data.qrCode || `FIN-${data.cedula}`}
               </p>
             </div>

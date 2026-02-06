@@ -75,10 +75,10 @@ export const DominicanRepublicMap = ({ provinces, onProvinceClick }: DominicanRe
   };
 
   const getFill = (province?: ProvinceData) => {
-    if (!province) return "hsl(var(--fin-map-inprogress))";
+    if (!province) return "hsl(var(--fin-map-steel))";
 
     const metaCumplida = province.cidp_activated || province.registration_count >= province.target_count;
-    return metaCumplida ? "hsl(var(--fin-map-victory))" : "hsl(var(--fin-map-inprogress))";
+    return metaCumplida ? "hsl(var(--fin-map-victory))" : "hsl(var(--fin-map-steel))";
   };
 
   const setTooltipFromEvent = (evt: MouseEvent, next: Omit<TooltipState, "x" | "y">) => {
@@ -95,14 +95,14 @@ export const DominicanRepublicMap = ({ provinces, onProvinceClick }: DominicanRe
   const tooltipMaxLeft = (containerRef.current?.clientWidth ?? 0) - 220;
 
   return (
-    <div ref={containerRef} className="relative w-full overflow-hidden rounded-xl card-industrial">
+    <div ref={containerRef} className="relative w-full overflow-hidden rounded-xl bg-[hsl(220,50%,8%)] border border-white/10">
       <ComposableMap
         projection="geoMercator"
         projectionConfig={{ center: [-70.4, 18.9], scale: 12000 }}
         width={800}
         height={520}
         className="w-full h-auto"
-        style={{ maxHeight: "60vh" }}
+        style={{ maxHeight: "60vh", background: "linear-gradient(180deg, hsl(220 50% 6%) 0%, hsl(220 60% 4%) 100%)" }}
         role="img"
         aria-label="Mapa provincial de la República Dominicana"
       >
@@ -139,41 +139,16 @@ export const DominicanRepublicMap = ({ provinces, onProvinceClick }: DominicanRe
                     }
                     style={{
                       default: { fill, outline: "none" },
-                      hover: { fill, outline: "none", filter: "brightness(1.12)" },
+                      hover: { fill, outline: "none", filter: "brightness(1.25) drop-shadow(0 0 8px rgba(255,255,255,0.3))" },
                       pressed: { fill, outline: "none" },
                     }}
-                    stroke="hsl(var(--border))"
-                    strokeWidth={isHovered ? 1.5 : 1}
+                    stroke="rgba(255,255,255,0.5)"
+                    strokeWidth={isHovered ? 1.2 : 0.6}
                     opacity={province ? 1 : 0.95}
                   />
                 );
               })}
-              {/* Province labels */}
-              {geographies.map((geo) => {
-                const centroid = geoCentroid(geo);
-                const { geoName, province } = matchProvince(geo);
-                const metaCumplida = province?.cidp_activated || (province && province.registration_count >= province.target_count);
-                
-                return (
-                  <Marker key={`label-${geo.rsmKey}`} coordinates={centroid}>
-                    <text
-                      textAnchor="middle"
-                      style={{
-                        fontFamily: "system-ui, sans-serif",
-                        fontSize: 7,
-                        fontWeight: 600,
-                        fill: metaCumplida ? "#ffffff" : "#1a365d",
-                        pointerEvents: "none",
-                        textShadow: metaCumplida 
-                          ? "0 1px 2px rgba(0,0,0,0.6)" 
-                          : "0 0 3px rgba(255,255,255,0.8)",
-                      }}
-                    >
-                      {geoName}
-                    </text>
-                  </Marker>
-                );
-              })}
+              {/* Province labels - only shown on hover via tooltip */}
             </>
           )}
         </Geographies>
