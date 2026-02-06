@@ -1,12 +1,13 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { Shield, Hand, Camera, MapPin, Check, Loader2, ShieldCheck, ArrowLeft } from 'lucide-react';
+import { Shield, Hand, Camera, MapPin, Check, Loader2, ShieldCheck, ArrowLeft, ScanLine } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useRegistration } from '@/hooks/useRegistration';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { BiometricStep } from './BiometricStep';
 import { BotinExplanation } from './BotinExplanation';
+import { CedulaOCRValidator } from './CedulaOCRValidator';
 
 interface Step {
   id: number;
@@ -364,20 +365,37 @@ const OathStep = ({ onComplete }: { onComplete: () => void }) => {
 
 // Peldaño 2: Evidencia de Identidad
 const EvidenceStep = ({ onComplete }: { onComplete: () => void }) => {
-  const [currentPhoto, setCurrentPhoto] = useState<'front' | 'back' | 'selfie'>('front');
+  const [currentPhoto, setCurrentPhoto] = useState<'front' | 'ocr-validation' | 'back' | 'selfie'>('front');
   const [photos, setPhotos] = useState<{ front?: string; back?: string; selfie?: string }>({});
   const [isUploading, setIsUploading] = useState(false);
+  const [ocrValidated, setOcrValidated] = useState(false);
+  const [frontImageFile, setFrontImageFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { data, updateData } = useRegistration();
 
   const photoLabels = {
     front: 'Cédula (Frente)',
+    'ocr-validation': 'Validación OCR',
     back: 'Cédula (Reverso)',
     selfie: 'Selfie de Integridad',
   };
 
   const handleCapture = () => {
     fileInputRef.current?.click();
+  };
+
+  const handleOCRComplete = (isValid: boolean, extractedCedula?: string) => {
+    setOcrValidated(true);
+    if (isValid) {
+      toast.success('¡Cédula verificada por OCR!');
+    }
+    // Move to back photo regardless of OCR result
+    setCurrentPhoto('back');
+  };
+
+  const handleOCRSkip = () => {
+    setOcrValidated(false);
+    setCurrentPhoto('back');
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -419,7 +437,9 @@ const EvidenceStep = ({ onComplete }: { onComplete: () => void }) => {
       }
       
       // Use user_id in file path for RLS compliance
-      const fileName = `${user.id}/${currentPhoto}-${Date.now()}.${fileExt}`;
+      // For OCR validation step, we need to handle the actual photo type
+      const actualPhotoType = currentPhoto === 'ocr-validation' ? 'front' : currentPhoto;
+      const fileName = `${user.id}/${actualPhotoType}-${Date.now()}.${fileExt}`;
       
       const { error: uploadError } = await supabase.storage
         .from('evidencias')
@@ -436,31 +456,42 @@ const EvidenceStep = ({ onComplete }: { onComplete: () => void }) => {
 
       const url = signedUrlData.signedUrl;
       
-      setPhotos(prev => ({ ...prev, [currentPhoto]: url }));
-      
-      // Update in database - store the file path, not the signed URL
-      const columnMap = {
-        front: 'cedula_front_url',
-        back: 'cedula_back_url',
-        selfie: 'selfie_url',
-      };
-      
-      // Store the permanent file reference (path) in the database
-      const storagePath = `${fileName}`;
-      
-      if (data.registrationId) {
-        await supabase
-          .from('registrations')
-          .update({ [columnMap[currentPhoto]]: storagePath })
-          .eq('id', data.registrationId);
-      }
-
-      // Move to next photo or complete
+      // For front photo, store it and go to OCR validation
       if (currentPhoto === 'front') {
-        setCurrentPhoto('back');
+        setPhotos(prev => ({ ...prev, front: url }));
+        setFrontImageFile(file); // Store for OCR processing
+        
+        // Update database
+        if (data.registrationId) {
+          await supabase
+            .from('registrations')
+            .update({ cedula_front_url: fileName })
+            .eq('id', data.registrationId);
+        }
+        
+        // Go to OCR validation step
+        setCurrentPhoto('ocr-validation');
       } else if (currentPhoto === 'back') {
+        setPhotos(prev => ({ ...prev, back: url }));
+        
+        if (data.registrationId) {
+          await supabase
+            .from('registrations')
+            .update({ cedula_back_url: fileName })
+            .eq('id', data.registrationId);
+        }
+        
         setCurrentPhoto('selfie');
-      } else {
+      } else if (currentPhoto === 'selfie') {
+        setPhotos(prev => ({ ...prev, selfie: url }));
+        
+        if (data.registrationId) {
+          await supabase
+            .from('registrations')
+            .update({ selfie_url: fileName })
+            .eq('id', data.registrationId);
+        }
+        
         updateData({
           cedulaFrontUrl: photos.front,
           cedulaBackUrl: photos.back,
@@ -508,84 +539,106 @@ const EvidenceStep = ({ onComplete }: { onComplete: () => void }) => {
 
       {/* Photo progress */}
       <div className="flex gap-3">
-        {(['front', 'back', 'selfie'] as const).map((type) => (
-          <div
-            key={type}
-            className={`flex-1 p-3 rounded-lg border-2 transition-all ${
-              currentPhoto === type
-                ? 'border-primary bg-primary/10'
-                : photos[type]
-                ? 'border-bronze bg-bronze/10'
-                : 'border-muted bg-muted/50'
-            }`}
-          >
-            <div className="flex items-center gap-2">
-              {photos[type] ? (
-                <Check className="w-4 h-4 text-bronze" />
-              ) : currentPhoto === type ? (
-                <Camera className="w-4 h-4 text-primary" />
-              ) : (
-                <div className="w-4 h-4 rounded-full border-2 border-muted-foreground/50" />
-              )}
-              <span className="text-xs font-medium text-foreground">
-                {type === 'front' ? 'Frente' : type === 'back' ? 'Reverso' : 'Selfie'}
-              </span>
+        {(['front', 'back', 'selfie'] as const).map((type) => {
+          const isActive = currentPhoto === type || (currentPhoto === 'ocr-validation' && type === 'front');
+          const isCompleted = photos[type] && (type !== 'front' || currentPhoto !== 'ocr-validation');
+          
+          return (
+            <div
+              key={type}
+              className={`flex-1 p-3 rounded-lg border-2 transition-all ${
+                isActive
+                  ? 'border-primary bg-primary/10'
+                  : isCompleted
+                  ? 'border-bronze bg-bronze/10'
+                  : 'border-muted bg-muted/50'
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                {isCompleted ? (
+                  <Check className="w-4 h-4 text-bronze" />
+                ) : isActive ? (
+                  currentPhoto === 'ocr-validation' ? (
+                    <ScanLine className="w-4 h-4 text-primary" />
+                  ) : (
+                    <Camera className="w-4 h-4 text-primary" />
+                  )
+                ) : (
+                  <div className="w-4 h-4 rounded-full border-2 border-muted-foreground/50" />
+                )}
+                <span className="text-xs font-medium text-foreground">
+                  {type === 'front' ? 'Frente' : type === 'back' ? 'Reverso' : 'Selfie'}
+                </span>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
-      {/* Capture area */}
-      <motion.div
-        className="card-industrial rounded-xl aspect-[4/3] flex flex-col items-center justify-center p-8"
-        key={currentPhoto}
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-      >
-        {photos[currentPhoto] ? (
-          <img
-            src={photos[currentPhoto]}
-            alt={photoLabels[currentPhoto]}
-            className="max-h-full max-w-full rounded-lg object-contain"
-          />
-        ) : (
-          <div className="text-center space-y-4">
-            <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mx-auto">
-              <Camera className="w-10 h-10 text-muted-foreground" />
-            </div>
-            <div>
-              <p className="font-bold text-foreground">{photoLabels[currentPhoto]}</p>
-              <p className="text-sm text-muted-foreground">
-                {currentPhoto === 'selfie' 
-                  ? 'Toma una foto clara de tu rostro'
-                  : 'Asegúrate que sea legible'
-                }
-              </p>
-            </div>
-          </div>
-        )}
-      </motion.div>
+      {/* OCR Validation Step */}
+      {currentPhoto === 'ocr-validation' && (
+        <CedulaOCRValidator
+          userCedula={data.cedula}
+          onValidationComplete={handleOCRComplete}
+          onSkip={handleOCRSkip}
+        />
+      )}
 
-      {/* Capture button */}
-      <Button
-        variant="gladiator"
-        size="xl"
-        className="w-full"
-        onClick={handleCapture}
-        disabled={isUploading}
-      >
-        {isUploading ? (
-          <>
-            <Loader2 className="w-5 h-5 animate-spin" />
-            Subiendo...
-          </>
-        ) : (
-          <>
-            <Camera className="w-5 h-5" />
-            CAPTURAR {photoLabels[currentPhoto].toUpperCase()}
-          </>
-        )}
-      </Button>
+      {/* Capture area - only show when not in OCR validation */}
+      {currentPhoto !== 'ocr-validation' && (
+        <>
+          <motion.div
+            className="card-industrial rounded-xl aspect-[4/3] flex flex-col items-center justify-center p-8"
+            key={currentPhoto}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+          >
+            {photos[currentPhoto] ? (
+              <img
+                src={photos[currentPhoto]}
+                alt={photoLabels[currentPhoto]}
+                className="max-h-full max-w-full rounded-lg object-contain"
+              />
+            ) : (
+              <div className="text-center space-y-4">
+                <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mx-auto">
+                  <Camera className="w-10 h-10 text-muted-foreground" />
+                </div>
+                <div>
+                  <p className="font-bold text-foreground">{photoLabels[currentPhoto]}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {currentPhoto === 'selfie' 
+                      ? 'Toma una foto clara de tu rostro'
+                      : 'Asegúrate que sea legible'
+                    }
+                  </p>
+                </div>
+              </div>
+            )}
+          </motion.div>
+
+          {/* Capture button */}
+          <Button
+            variant="gladiator"
+            size="xl"
+            className="w-full"
+            onClick={handleCapture}
+            disabled={isUploading}
+          >
+            {isUploading ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
+                Subiendo...
+              </>
+            ) : (
+              <>
+                <Camera className="w-5 h-5" />
+                CAPTURAR {photoLabels[currentPhoto].toUpperCase()}
+              </>
+            )}
+          </Button>
+        </>
+      )}
     </motion.div>
   );
 };
