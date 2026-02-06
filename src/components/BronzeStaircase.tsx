@@ -384,10 +384,13 @@ const EvidenceStep = ({ onComplete }: { onComplete: () => void }) => {
     fileInputRef.current?.click();
   };
 
-  const handleOCRComplete = (isValid: boolean, extractedCedula?: string) => {
+  const handleOCRComplete = (isValid: boolean, extractedCedula?: string, provincia?: string) => {
     setOcrValidated(true);
     if (isValid) {
       toast.success('¡Cédula verificada por OCR!');
+      if (provincia) {
+        toast.success(`Provincia: ${provincia}`);
+      }
     }
     // Move to back photo regardless of OCR result
     setCurrentPhoto('back');
@@ -579,6 +582,7 @@ const EvidenceStep = ({ onComplete }: { onComplete: () => void }) => {
       {currentPhoto === 'ocr-validation' && (
         <CedulaOCRValidator
           userCedula={data.cedula}
+          registrationId={data.registrationId}
           onValidationComplete={handleOCRComplete}
           onSkip={handleOCRSkip}
         />

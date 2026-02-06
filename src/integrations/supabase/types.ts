@@ -64,6 +64,45 @@ export type Database = {
           },
         ]
       }
+      province_counters: {
+        Row: {
+          cidp_activated: boolean
+          cidp_activated_at: string | null
+          created_at: string
+          id: string
+          province_code: string
+          province_name: string
+          registration_count: number
+          target_count: number
+          updated_at: string
+          zone_type: string
+        }
+        Insert: {
+          cidp_activated?: boolean
+          cidp_activated_at?: string | null
+          created_at?: string
+          id?: string
+          province_code: string
+          province_name: string
+          registration_count?: number
+          target_count?: number
+          updated_at?: string
+          zone_type: string
+        }
+        Update: {
+          cidp_activated?: boolean
+          cidp_activated_at?: string | null
+          created_at?: string
+          id?: string
+          province_code?: string
+          province_name?: string
+          registration_count?: number
+          target_count?: number
+          updated_at?: string
+          zone_type?: string
+        }
+        Relationships: []
+      }
       registrations: {
         Row: {
           cedula: string
@@ -78,6 +117,7 @@ export type Database = {
           oath_accepted: boolean | null
           passport_level: string | null
           phone: string
+          provincia: string | null
           qr_code: string | null
           referral_code: string | null
           referred_by: string | null
@@ -102,6 +142,7 @@ export type Database = {
           oath_accepted?: boolean | null
           passport_level?: string | null
           phone: string
+          provincia?: string | null
           qr_code?: string | null
           referral_code?: string | null
           referred_by?: string | null
@@ -126,6 +167,7 @@ export type Database = {
           oath_accepted?: boolean | null
           passport_level?: string | null
           phone?: string
+          provincia?: string | null
           qr_code?: string | null
           referral_code?: string | null
           referred_by?: string | null
