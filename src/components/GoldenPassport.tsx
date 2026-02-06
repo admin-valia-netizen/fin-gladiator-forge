@@ -230,7 +230,7 @@ export const GoldenPassport = () => {
 
         {/* Important message */}
         <motion.div
-          className="w-full mt-6 card-industrial p-5 rounded-xl border-l-4 border-amber-500"
+          className="w-full mt-6 card-industrial p-5 rounded-xl border border-amber-500/30"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.9 }}
