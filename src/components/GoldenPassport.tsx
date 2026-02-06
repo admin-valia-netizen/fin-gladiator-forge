@@ -213,14 +213,14 @@ export const GoldenPassport = () => {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.8 + index * 0.1 }}
               >
-                <div className="w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-500">
+                <div className="w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-500 flex-shrink-0">
                   {benefit.icon}
                 </div>
-                <div>
-                  <p className="text-sm font-medium text-foreground">{benefit.title}</p>
-                  <div className="flex items-center gap-1 text-xs text-amber-500">
-                    <CheckCircle className="w-3 h-3" />
-                    Listo para reclamar
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-foreground no-underline decoration-transparent" style={{ textDecoration: 'none' }}>{benefit.title}</p>
+                  <div className="flex items-center gap-1 text-xs text-amber-500 no-underline decoration-transparent" style={{ textDecoration: 'none' }}>
+                    <CheckCircle className="w-3 h-3 flex-shrink-0" />
+                    <span style={{ textDecoration: 'none' }}>Listo para reclamar</span>
                   </div>
                 </div>
               </motion.div>
