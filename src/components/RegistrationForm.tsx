@@ -187,7 +187,7 @@ export const RegistrationForm = () => {
       
       {/* Header */}
       <motion.header
-        className="relative z-10 px-6 py-8"
+        className="relative z-10 px-6 py-5"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
       >
@@ -196,7 +196,7 @@ export const RegistrationForm = () => {
           variant="ghost"
           size="sm"
           onClick={() => setStep('onboarding')}
-          className="text-muted-foreground hover:text-foreground mb-4"
+          className="text-muted-foreground hover:text-foreground mb-2"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Volver al inicio
@@ -213,12 +213,12 @@ export const RegistrationForm = () => {
 
       {/* Form */}
       <motion.div
-        className="relative z-10 flex-1 px-6 pb-8"
+        className="relative z-10 flex-1 px-6 pb-6"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
       >
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {/* Full Name */}
           <div className="space-y-2">
             <Label htmlFor="fullName" className="flex items-center gap-2 text-foreground">
@@ -228,7 +228,7 @@ export const RegistrationForm = () => {
             <Input
               id="fullName"
               placeholder="Juan Carlos Pérez García"
-              className="bg-card border-bronze/30 focus:border-primary h-12"
+              className="bg-card border-bronze/30 focus:border-primary h-11"
               {...register('fullName')}
             />
             {errors.fullName && (
@@ -246,7 +246,7 @@ export const RegistrationForm = () => {
               id="cedula"
               placeholder="00112345678"
               maxLength={11}
-              className="bg-card border-bronze/30 focus:border-primary h-12 font-mono"
+              className="bg-card border-bronze/30 focus:border-primary h-11 font-mono"
               {...register('cedula')}
             />
             {errors.cedula && (
@@ -264,7 +264,7 @@ export const RegistrationForm = () => {
               id="phone"
               placeholder="8091234567"
               maxLength={10}
-              className="bg-card border-bronze/30 focus:border-primary h-12 font-mono"
+              className="bg-card border-bronze/30 focus:border-primary h-11 font-mono"
               {...register('phone')}
             />
             {errors.phone && (
@@ -274,7 +274,7 @@ export const RegistrationForm = () => {
 
           {/* Legal notice */}
           <motion.div
-            className="p-4 bg-muted/30 rounded-xl border border-bronze/20"
+            className="p-3 bg-muted/30 rounded-xl border border-bronze/20"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.35 }}
@@ -289,7 +289,7 @@ export const RegistrationForm = () => {
 
           {/* Legal acceptance */}
           <motion.div 
-            className="card-industrial p-4 rounded-xl space-y-3"
+            className="card-industrial p-3 rounded-xl space-y-3"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
