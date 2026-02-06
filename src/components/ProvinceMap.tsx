@@ -126,13 +126,13 @@ export const ProvinceMap = () => {
           </div>
         </div>
         <Button
-          variant="outline"
-          size="sm"
+          variant="default"
+          size="lg"
           onClick={() => setShowInfoModal(true)}
-          className="gap-2"
+          className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-4 py-3 rounded-xl shadow-lg glow-pulse"
         >
-          <Info className="w-4 h-4" />
-          <span className="hidden sm:inline">Información sobre Recompensas</span>
+          <Info className="w-5 h-5" />
+          <span className="text-sm">¿Qué es la Recompensa?</span>
         </Button>
       </div>
 
