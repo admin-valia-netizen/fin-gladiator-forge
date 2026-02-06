@@ -208,7 +208,7 @@ export const GoldenPassport = () => {
             {benefits.map((benefit, index) => (
               <motion.div
                 key={benefit.id}
-                className="p-4 rounded-xl bg-gradient-to-br from-amber-500/10 to-amber-600/5 border border-amber-500/30 flex items-center gap-3"
+                className="p-4 rounded-xl bg-gradient-to-br from-amber-500/10 to-amber-600/5 border border-amber-500/30 flex items-center gap-3 [&_*]:!no-underline [&_*]:!decoration-transparent"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.8 + index * 0.1 }}
@@ -217,10 +217,10 @@ export const GoldenPassport = () => {
                   {benefit.icon}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-foreground no-underline decoration-transparent" style={{ textDecoration: 'none' }}>{benefit.title}</p>
-                  <div className="flex items-center gap-1 text-xs text-amber-500 no-underline decoration-transparent" style={{ textDecoration: 'none' }}>
+                  <p className="text-sm font-medium text-foreground">{benefit.title}</p>
+                  <div className="flex items-center gap-1 text-xs text-amber-500">
                     <CheckCircle className="w-3 h-3 flex-shrink-0" />
-                    <span style={{ textDecoration: 'none' }}>Listo para reclamar</span>
+                    <span>Listo para reclamar</span>
                   </div>
                 </div>
               </motion.div>
