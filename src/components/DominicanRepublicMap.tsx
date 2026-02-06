@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState, type MouseEvent } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ComposableMap, Geographies, Geography } from "react-simple-maps";
+import { ComposableMap, Geographies, Geography, Marker } from "react-simple-maps";
+import { geoCentroid } from "d3-geo";
 
 interface ProvinceData {
   id: string;
@@ -66,7 +67,6 @@ export const DominicanRepublicMap = ({ provinces, onProvinceClick }: DominicanRe
     const direct = provinceByName.get(key);
     if (direct) return { geoName: direct.province_name, province: direct };
 
-    // Búsqueda por inclusión (por diferencias menores en nombres)
     for (const [k, p] of provinceByName.entries()) {
       if (key.includes(k) || k.includes(key)) return { geoName: p.province_name, province: p };
     }
@@ -107,47 +107,75 @@ export const DominicanRepublicMap = ({ provinces, onProvinceClick }: DominicanRe
         aria-label="Mapa provincial de la República Dominicana"
       >
         <Geographies geography={GEO_URL}>
-          {({ geographies }) =>
-            geographies.map((geo) => {
-              const { geoName, province } = matchProvince(geo);
-              const fill = getFill(province);
-              const isHovered = hoveredKey === geo.rsmKey;
+          {({ geographies }) => (
+            <>
+              {geographies.map((geo) => {
+                const { geoName, province } = matchProvince(geo);
+                const fill = getFill(province);
+                const isHovered = hoveredKey === geo.rsmKey;
 
-              return (
-                <Geography
-                  key={geo.rsmKey}
-                  geography={geo}
-                  onMouseEnter={(evt) => {
-                    setHoveredKey(geo.rsmKey);
-                    setTooltipFromEvent(evt, { geoName, province });
-                  }}
-                  onMouseMove={(evt) => {
-                    if (hoveredKey !== geo.rsmKey) return;
-                    setTooltipFromEvent(evt, { geoName, province });
-                  }}
-                  onMouseLeave={() => {
-                    setHoveredKey(null);
-                    setTooltip(null);
-                  }}
-                  onClick={() => {
-                    if (province) onProvinceClick(province);
-                  }}
-                  className={
-                    (province ? "cursor-pointer" : "cursor-default") +
-                    " transition-[filter] duration-150"
-                  }
-                  style={{
-                    default: { fill, outline: "none" },
-                    hover: { fill, outline: "none", filter: "brightness(1.12)" },
-                    pressed: { fill, outline: "none" },
-                  }}
-                  stroke="hsl(var(--border))"
-                  strokeWidth={isHovered ? 1.5 : 1}
-                  opacity={province ? 1 : 0.95}
-                />
-              );
-            })
-          }
+                return (
+                  <Geography
+                    key={geo.rsmKey}
+                    geography={geo}
+                    onMouseEnter={(evt) => {
+                      setHoveredKey(geo.rsmKey);
+                      setTooltipFromEvent(evt, { geoName, province });
+                    }}
+                    onMouseMove={(evt) => {
+                      if (hoveredKey !== geo.rsmKey) return;
+                      setTooltipFromEvent(evt, { geoName, province });
+                    }}
+                    onMouseLeave={() => {
+                      setHoveredKey(null);
+                      setTooltip(null);
+                    }}
+                    onClick={() => {
+                      if (province) onProvinceClick(province);
+                    }}
+                    className={
+                      (province ? "cursor-pointer" : "cursor-default") +
+                      " transition-[filter] duration-150"
+                    }
+                    style={{
+                      default: { fill, outline: "none" },
+                      hover: { fill, outline: "none", filter: "brightness(1.12)" },
+                      pressed: { fill, outline: "none" },
+                    }}
+                    stroke="hsl(var(--border))"
+                    strokeWidth={isHovered ? 1.5 : 1}
+                    opacity={province ? 1 : 0.95}
+                  />
+                );
+              })}
+              {/* Province labels */}
+              {geographies.map((geo) => {
+                const centroid = geoCentroid(geo);
+                const { geoName, province } = matchProvince(geo);
+                const metaCumplida = province?.cidp_activated || (province && province.registration_count >= province.target_count);
+                
+                return (
+                  <Marker key={`label-${geo.rsmKey}`} coordinates={centroid}>
+                    <text
+                      textAnchor="middle"
+                      style={{
+                        fontFamily: "system-ui, sans-serif",
+                        fontSize: 7,
+                        fontWeight: 600,
+                        fill: metaCumplida ? "#ffffff" : "#1a365d",
+                        pointerEvents: "none",
+                        textShadow: metaCumplida 
+                          ? "0 1px 2px rgba(0,0,0,0.6)" 
+                          : "0 0 3px rgba(255,255,255,0.8)",
+                      }}
+                    >
+                      {geoName}
+                    </text>
+                  </Marker>
+                );
+              })}
+            </>
+          )}
         </Geographies>
       </ComposableMap>
 
