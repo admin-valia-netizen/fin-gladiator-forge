@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState, type MouseEvent } from "react";
+import { useMemo, useRef, useState, type MouseEvent, type TouchEvent } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ComposableMap, Geographies, Geography, Marker } from "react-simple-maps";
 import { geoCentroid } from "d3-geo";
@@ -81,14 +81,26 @@ export const DominicanRepublicMap = ({ provinces, onProvinceClick }: DominicanRe
     return metaCumplida ? "hsl(var(--fin-map-victory))" : "hsl(var(--fin-map-steel))";
   };
 
-  const setTooltipFromEvent = (evt: MouseEvent, next: Omit<TooltipState, "x" | "y">) => {
+  const getClientPoint = (evt: MouseEvent | TouchEvent) => {
+    if ("touches" in evt) {
+      const t = evt.touches[0] ?? evt.changedTouches[0];
+      return t ? { clientX: t.clientX, clientY: t.clientY } : null;
+    }
+
+    return { clientX: evt.clientX, clientY: evt.clientY };
+  };
+
+  const setTooltipFromEvent = (evt: MouseEvent | TouchEvent, next: Omit<TooltipState, "x" | "y">) => {
     const rect = containerRef.current?.getBoundingClientRect();
     if (!rect) return;
 
+    const pt = getClientPoint(evt);
+    if (!pt) return;
+
     setTooltip({
       ...next,
-      x: evt.clientX - rect.left,
-      y: evt.clientY - rect.top,
+      x: pt.clientX - rect.left,
+      y: pt.clientY - rect.top,
     });
   };
 
@@ -130,7 +142,16 @@ export const DominicanRepublicMap = ({ provinces, onProvinceClick }: DominicanRe
                       setHoveredKey(null);
                       setTooltip(null);
                     }}
-                    onClick={() => {
+                    onTouchStart={(evt) => {
+                      setHoveredKey(geo.rsmKey);
+                      setTooltipFromEvent(evt, { geoName, province });
+                    }}
+                    onTouchMove={(evt) => {
+                      if (hoveredKey !== geo.rsmKey) return;
+                      setTooltipFromEvent(evt, { geoName, province });
+                    }}
+                    onClick={(evt) => {
+                      setTooltipFromEvent(evt, { geoName, province });
                       if (province) onProvinceClick(province);
                     }}
                     className={

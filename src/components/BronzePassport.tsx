@@ -184,13 +184,13 @@ export const BronzePassport = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col p-4 pb-8">
+    <div className="min-h-screen bg-background flex flex-col p-3 pb-6">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-carbon" />
       
       {/* Content */}
       <motion.div
-        className="relative z-10 flex-1 flex flex-col items-center justify-center max-w-md mx-auto"
+        className="relative z-10 flex-1 flex flex-col items-center max-w-md mx-auto w-full pt-2"
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5 }}
@@ -199,7 +199,7 @@ export const BronzePassport = () => {
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          className="self-start mb-4"
+          className="self-start mb-3"
         >
           <Button
             variant="ghost"
@@ -214,7 +214,7 @@ export const BronzePassport = () => {
 
         {/* Success message */}
         <motion.div
-          className="text-center mb-8"
+          className="text-center mb-4"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
