@@ -1,41 +1,68 @@
 <!doctype html>
 <html lang="es">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    
-    <!-- App Info -->
     <title>FIN - Frente de Integridad Nacional</title>
-    <meta name="description" content="Únete a los Gladiadores de FIN y forja tu destino con mérito e integridad." />
-    <meta name="author" content="FIN" />
-
-    <!-- PWA Meta Tags -->
-    <meta name="theme-color" content="#CD7F32" />
-    <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="FIN" />
     
-    <!-- PWA Icons -->
-    <link rel="icon" type="image/png" href="/favicon.ico" />
-    <link rel="apple-touch-icon" href="/pwa-192x192.png" />
-    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="theme-color" content="#004A99" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" type="image/png" href="/logo-fin.png" />
 
-    <!-- Open Graph -->
-    <meta property="og:title" content="FIN - Frente de Integridad Nacional" />
-    <meta property="og:description" content="Únete a los Gladiadores de FIN y forja tu destino con mérito e integridad." />
-    <meta property="og:type" content="website" />
-    <meta property="og:image" content="/pwa-512x512.png" />
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+        #scanner-container { text-align: center; padding: 25px; background: #fff; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 85%; max-width: 400px; }
+        h2 { color: #004A99; margin-bottom: 10px; }
+        #btn-scan { padding: 15px 30px; background: #004A99; color: #fff; border: none; border-radius: 50px; cursor: pointer; font-weight: bold; font-size: 16px; width: 100%; transition: 0.3s; }
+        #btn-scan:active { transform: scale(0.98); background: #003366; }
+        #resultado { margin-top: 20px; font-size: 14px; color: #555; line-height: 1.5; }
+    </style>
+</head>
 
-    <!-- Twitter -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="FIN - Frente de Integridad Nacional" />
-    <meta name="twitter:description" content="Únete a los Gladiadores de FIN" />
-    <meta name="twitter:image" content="/pwa-512x512.png" />
-  </head>
-
-  <body>
+<body>
     <div id="root"></div>
+
+    <div id="scanner-container">
+        <h2>Registro de Gladiador</h2>
+        <p>Escanea tu cédula para validar tu integridad y recibir tu recompensa.</p>
+        <button id="btn-scan">📷 Escanear Cédula</button>
+        <div id="resultado"></div>
+    </div>
+
+    <script src="https://unpkg.com/tesseract.js@v2.1.0/dist/tesseract.min.js"></script>
     <script type="module" src="/src/main.tsx"></script>
-  </body>
+
+    <script>
+        const btnScan = document.getElementById('btn-scan');
+        const resultado = document.getElementById('resultado');
+
+        btnScan.onclick = async () => {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.capture = 'camera';
+            input.click();
+
+            input.onchange = async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                resultado.innerHTML = "<b>Procesando cédula...</b><br>Validando en el sistema FIN.";
+
+                Tesseract.recognize(file, 'spa').then(({ data: { text } }) => {
+                    resultado.innerHTML = "<span style='color:green; font-weight:bold;'>¡Gladiador Validado!</span><br>Tus datos han sido procesados localmente.";
+                    console.log("Datos:", text);
+                    alert("¡Bienvenido al Frente de Integridad Nacional! Has recibido tu RECOMPENSA por unirte.");
+                }).catch(err => {
+                    resultado.innerHTML = "<span style='color:red;'>Error de lectura.</span><br>Intenta con más luz y que la cédula se vea clara.";
+                });
+            };
+        };
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js');
+            });
+        }
+    </script>
+</body>
 </html>
