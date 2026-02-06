@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MapPin, Users, Trophy, Info, Target, ChevronRight, Anchor, Wheat, Building2 } from 'lucide-react';
+import { MapPin, Users, Trophy, Info, Target, Anchor, Wheat, Building2, List, Map } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import {
@@ -10,7 +10,9 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
+import { DominicanRepublicMap } from './DominicanRepublicMap';
 
 interface ProvinceData {
   id: string;
@@ -130,7 +132,7 @@ export const ProvinceMap = () => {
           className="gap-2"
         >
           <Info className="w-4 h-4" />
-          Información sobre Recompensas
+          <span className="hidden sm:inline">Información sobre Recompensas</span>
         </Button>
       </div>
 
@@ -153,61 +155,85 @@ export const ProvinceMap = () => {
         </div>
       </div>
 
-      {/* Province List with Progress */}
-      <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-2">
-        {provinces.map((province, index) => {
-          const percentage = Math.min((province.registration_count / province.target_count) * 100, 100);
-          const ZoneIcon = ZONE_ICONS[province.zone_type];
-          
-          return (
-            <motion.div
-              key={province.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.03 }}
-              className={`card-industrial p-4 rounded-xl cursor-pointer transition-all hover:border-primary/50 ${
-                province.cidp_activated ? 'border-green-500/30' : ''
-              }`}
-              onClick={() => setSelectedProvince(province)}
-            >
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-3">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                    province.cidp_activated ? 'bg-green-500/20' : 'bg-primary/20'
-                  }`}>
-                    <ZoneIcon className={`w-4 h-4 ${
-                      province.cidp_activated ? 'text-green-500' : 'text-primary'
-                    }`} />
-                  </div>
-                  <div>
-                    <p className="font-medium text-foreground">{province.province_name}</p>
-                    <p className="text-xs text-muted-foreground">{ZONE_LABELS[province.zone_type]}</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="font-bold text-foreground">
-                    {province.registration_count.toLocaleString()}
-                    <span className="text-muted-foreground font-normal">/{province.target_count.toLocaleString()}</span>
-                  </p>
-                  {province.cidp_activated && (
-                    <span className="text-xs text-green-500 font-medium">¡CIDP Activado!</span>
-                  )}
-                </div>
-              </div>
+      {/* Tabs for Map vs List view */}
+      <Tabs defaultValue="map" className="w-full">
+        <TabsList className="grid w-full grid-cols-2 mb-4">
+          <TabsTrigger value="map" className="gap-2">
+            <Map className="w-4 h-4" />
+            Mapa Visual
+          </TabsTrigger>
+          <TabsTrigger value="list" className="gap-2">
+            <List className="w-4 h-4" />
+            Lista
+          </TabsTrigger>
+        </TabsList>
+
+        {/* Map View */}
+        <TabsContent value="map">
+          <DominicanRepublicMap 
+            provinces={provinces} 
+            onProvinceClick={setSelectedProvince} 
+          />
+        </TabsContent>
+
+        {/* List View */}
+        <TabsContent value="list">
+          <div className="space-y-3 max-h-[50vh] overflow-y-auto pr-2">
+            {provinces.map((province, index) => {
+              const percentage = Math.min((province.registration_count / province.target_count) * 100, 100);
+              const ZoneIcon = ZONE_ICONS[province.zone_type];
               
-              <div className="relative h-2 bg-muted rounded-full overflow-hidden">
+              return (
                 <motion.div
-                  className={`h-full ${getProgressColor(province.registration_count, province.target_count)}`}
-                  initial={{ width: 0 }}
-                  animate={{ width: `${percentage}%` }}
-                  transition={{ duration: 0.8, delay: index * 0.03 }}
-                />
-              </div>
-              <p className="text-xs text-muted-foreground mt-1 text-right">{percentage.toFixed(1)}%</p>
-            </motion.div>
-          );
-        })}
-      </div>
+                  key={province.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.03 }}
+                  className={`card-industrial p-4 rounded-xl cursor-pointer transition-all hover:border-primary/50 ${
+                    province.cidp_activated ? 'border-green-500/30' : ''
+                  }`}
+                  onClick={() => setSelectedProvince(province)}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                        province.cidp_activated ? 'bg-green-500/20' : 'bg-primary/20'
+                      }`}>
+                        <ZoneIcon className={`w-4 h-4 ${
+                          province.cidp_activated ? 'text-green-500' : 'text-primary'
+                        }`} />
+                      </div>
+                      <div>
+                        <p className="font-medium text-foreground">{province.province_name}</p>
+                        <p className="text-xs text-muted-foreground">{ZONE_LABELS[province.zone_type]}</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-bold text-foreground">
+                        {province.registration_count.toLocaleString()}
+                        <span className="text-muted-foreground font-normal">/{province.target_count.toLocaleString()}</span>
+                      </p>
+                      {province.cidp_activated && (
+                        <span className="text-xs text-green-500 font-medium">¡CIDP Activado!</span>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="relative h-2 bg-muted rounded-full overflow-hidden">
+                    <motion.div
+                      className={`h-full ${getProgressColor(province.registration_count, province.target_count)}`}
+                      initial={{ width: 0 }}
+                      animate={{ width: `${percentage}%` }}
+                      transition={{ duration: 0.8, delay: index * 0.03 }}
+                    />
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1 text-right">{percentage.toFixed(1)}%</p>
+                </motion.div>
+              );
+            })}
+          </div>
+        </TabsContent>
+      </Tabs>
 
       {/* Province Detail Modal */}
       <AnimatePresence>
