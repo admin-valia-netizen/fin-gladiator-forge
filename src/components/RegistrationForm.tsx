@@ -187,7 +187,7 @@ export const RegistrationForm = () => {
       
       {/* Header */}
       <motion.header
-        className="relative z-10 px-6 py-5"
+        className="relative z-10 px-6 py-4"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
       >
@@ -202,12 +202,24 @@ export const RegistrationForm = () => {
           Volver al inicio
         </Button>
 
-        <div className="flex items-center gap-3">
-          <Shield className="w-8 h-8 text-primary" />
-          <div>
-            <h1 className="text-xl font-bold text-foreground">Registro de Integridad</h1>
-            <p className="text-sm text-muted-foreground">Únete a los Gladiadores de FIN</p>
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <Shield className="w-8 h-8 text-primary" />
+            <div>
+              <h1 className="text-xl font-bold text-foreground">Registro de Integridad</h1>
+              <p className="text-sm text-muted-foreground">Únete a los Gladiadores de FIN</p>
+            </div>
           </div>
+
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => setStep('quick-verify')}
+            className="shrink-0 text-muted-foreground hover:text-foreground"
+          >
+            ¿Ya te registraste?
+          </Button>
         </div>
       </motion.header>
 
@@ -325,7 +337,6 @@ export const RegistrationForm = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            className="space-y-3"
           >
             <Button
               type="submit"
@@ -346,16 +357,6 @@ export const RegistrationForm = () => {
                   <ArrowRight className="w-5 h-5" />
                 </>
               )}
-            </Button>
-
-            {/* Quick access for existing users */}
-            <Button
-              type="button"
-              variant="ghost"
-              className="w-full text-muted-foreground hover:text-foreground"
-              onClick={() => setStep('quick-verify')}
-            >
-              ¿Ya te registraste? Accede a tu Pasaporte
             </Button>
           </motion.div>
         </form>
