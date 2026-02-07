@@ -188,8 +188,7 @@ export const GoldenPassport = () => {
             </div>
           </div>
 
-          {/* Golden border decoration */}
-          <div className="h-2 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600" />
+
         </motion.div>
 
         {/* Unlocked benefits */}
@@ -230,7 +229,7 @@ export const GoldenPassport = () => {
 
         {/* Important message */}
         <motion.div
-          className="w-full mt-6 card-industrial p-5 rounded-xl border border-amber-500/30"
+          className="w-full mt-6 rounded-xl bg-card/60 backdrop-blur p-5"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.9 }}
@@ -284,8 +283,6 @@ export const GoldenPassport = () => {
         </motion.div>
       </motion.div>
 
-      {/* Bottom golden accent */}
-      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600" />
     </div>
   );
 };

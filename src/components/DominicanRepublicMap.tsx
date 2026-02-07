@@ -28,6 +28,15 @@ const normalize = (value: string) =>
     .replace(/\s+/g, " ")
     .trim();
 
+const wrapProvinceLabel = (name: string): string[] => {
+  const cleaned = name.replace(/\s+/g, " ").trim();
+  const parts = cleaned.split(" ").filter(Boolean);
+  if (cleaned.length <= 14 || parts.length <= 1) return [cleaned];
+
+  const mid = Math.ceil(parts.length / 2);
+  return [parts.slice(0, mid).join(" "), parts.slice(mid).join(" ")];
+};
+
 const getGeoProvinceName = (geo: any): string => {
   const p = geo?.properties ?? {};
   return (
@@ -104,18 +113,19 @@ export const DominicanRepublicMap = ({ provinces, onProvinceClick }: DominicanRe
     });
   };
 
-  const tooltipMaxLeft = (containerRef.current?.clientWidth ?? 0) - 220;
-
   return (
-    <div ref={containerRef} className="relative w-full overflow-hidden rounded-xl bg-background border border-border">
+    <div
+      ref={containerRef}
+      className="relative w-full overflow-hidden rounded-xl bg-background border border-border aspect-[4/3]"
+    >
       <ComposableMap
         projection="geoMercator"
-        projectionConfig={{ center: [-70.4, 18.9], scale: 11200 }}
+        projectionConfig={{ center: [-70.4, 18.9], scale: 10500 }}
         width={800}
-        height={480}
-        className="w-full h-auto"
+        height={600}
+        className="w-full h-full"
+        preserveAspectRatio="xMidYMid meet"
         style={{
-          maxHeight: "52vh",
           background: "linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--card)) 100%)",
         }}
         role="img"
@@ -157,10 +167,7 @@ export const DominicanRepublicMap = ({ provinces, onProvinceClick }: DominicanRe
                       setTooltipFromEvent(evt, { geoName, province });
                       if (province) onProvinceClick(province);
                     }}
-                    className={
-                      (province ? "cursor-pointer" : "cursor-default") +
-                      " transition-[filter] duration-150"
-                    }
+                    className={(province ? "cursor-pointer" : "cursor-default") + " transition-[filter] duration-150"}
                     style={{
                       default: { fill, outline: "none" },
                       hover: {
@@ -176,7 +183,42 @@ export const DominicanRepublicMap = ({ provinces, onProvinceClick }: DominicanRe
                   />
                 );
               })}
-              {/* Province labels - only shown on hover via tooltip */}
+
+              {/* Province labels (always visible) */}
+              {geographies.map((geo) => {
+                const { geoName } = matchProvince(geo);
+                const [lon, lat] = geoCentroid(geo);
+                const lines = wrapProvinceLabel(geoName);
+
+                const lineHeight = 14;
+                const startDy = -((lines.length - 1) * lineHeight) / 2;
+
+                return (
+                  <Marker key={`${geo.rsmKey}-label`} coordinates={[lon, lat]}>
+                    <text
+                      pointerEvents="none"
+                      textAnchor="middle"
+                      dominantBaseline="middle"
+                      style={{
+                        fontSize: "clamp(10px, 2.6vw, 15px)",
+                        fontWeight: 800,
+                        fill: "hsl(var(--foreground) / 0.85)",
+                        paintOrder: "stroke",
+                        stroke: "hsl(var(--background))",
+                        strokeWidth: 4,
+                        strokeLinecap: "round",
+                        strokeLinejoin: "round",
+                      }}
+                    >
+                      {lines.map((line, idx) => (
+                        <tspan key={idx} x={0} dy={idx === 0 ? startDy : lineHeight}>
+                          {line}
+                        </tspan>
+                      ))}
+                    </text>
+                  </Marker>
+                );
+              })}
             </>
           )}
         </Geographies>
