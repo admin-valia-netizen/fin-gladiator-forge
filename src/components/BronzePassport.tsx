@@ -511,8 +511,25 @@ export const BronzePassport = () => {
           >
             <RotateCcw className="w-4 h-4 mr-2" />
             Ver Demo Completa (Reiniciar)
-          </Button>
-                                </motion.div>
+                      </Button>
+          </motion.div>
+
+          {/* Requirement message if button is disabled */}
+          {!canValidateVote && (
+            <motion.div
+              className="w-full mt-2"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              <p className="text-xs text-center text-muted-foreground">
+                Para validar tu voto necesitas <span className="text-amber-500 font-semibold">10 referidos activos</span> o haber contribuido.
+              </p>
+              <p className="text-xs text-center text-muted-foreground mt-1">
+                Actualmente tienes <span className="text-primary font-semibold">{completedReferrals}/{REQUIRED_REFERRALS}</span> referidos.
+              </p>
+            </motion.div>
+          )}
+        </div>
       </div>
 
       {/* Bottom bronze accent */}
@@ -530,4 +547,4 @@ export const BronzePassport = () => {
 };
 
 export default BronzePassport;
-        
+      
