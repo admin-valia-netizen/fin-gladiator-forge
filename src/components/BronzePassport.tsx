@@ -38,7 +38,8 @@ export const BronzePassport = () => {
   const { data, resetDemo, setStep, updateData, forceShowBronze, setForceShowBronze } = useRegistration();
   const { signOut } = useAuth();
   const navigate = useNavigate();
-    // Lógica de Blindaje: QR que cambia cada 60 segundos
+  
+  // Lógica de Blindaje: QR que cambia cada 60 segundos
   const [timeSeed, setTimeSeed] = useState(Math.floor(Date.now() / 60000));
 
   useEffect(() => {
@@ -326,7 +327,7 @@ export const BronzePassport = () => {
                 <Crown className="w-5 h-5" />
                 Validación de Pago Pendiente
               </div>
-              <p className="text-xs text-muted-foreground mt-1">
+              <p className="text-xs text-muted-foreground mt-1 text-center">
                 Tu donación está siendo revisada. Te notificaremos cuando sea aprobada.
               </p>
             </div>
@@ -362,10 +363,10 @@ export const BronzePassport = () => {
           <p className="text-sm text-muted-foreground leading-relaxed mt-2">
             3. Después de votar, regresa aquí y presiona <span className="text-amber-500 font-semibold">"YA VOTÉ"</span> para subir tu selfie con el dedo entintado.
           </p>
-          <p className="text-sm text-amber-500 font-semibold mt-3">
+          <p className="text-sm text-amber-500 font-semibold mt-3 text-center">
             ¡Desbloquea tu Pasaporte Dorado y accede a la Recompensa si ganamos!
           </p>
-          <p className="text-xs text-muted-foreground mt-2 italic">
+          <p className="text-xs text-muted-foreground mt-2 italic text-center">
             También puedes obtener el Pasaporte Dorado realizando una donación de RD$5,000.
           </p>
         </motion.div>
