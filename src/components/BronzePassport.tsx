@@ -512,11 +512,11 @@ export const BronzePassport = () => {
             <RotateCcw className="w-4 h-4 mr-2" />
             Ver Demo Completa (Reiniciar)
           </Button>
-        </motion.div>
-      </motion.div>
+                </motion.div>
+      </div>
 
       {/* Bottom bronze accent */}
-      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-bronze" />
+      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-700 via-amber-500 to-amber-700" />
 
       {/* Donation Modal */}
       {showDonationModal && (
@@ -525,6 +525,11 @@ export const BronzePassport = () => {
           registrationId={data.registrationId}
         />
       )}
-    </div>
+    </motion.div>
+  );
+};
+
+export default BronzePassport;
+        
   );
 };
