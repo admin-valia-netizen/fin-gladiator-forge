@@ -522,7 +522,7 @@ export const BronzePassport = () => {
               animate={{ opacity: 1 }}
             >
               <p className="text-xs text-center text-muted-foreground">
-                Para validar tu voto necesitas <span className="text-amber-500 font-semibold">10 referidos activos</span> o haber contribuido.
+                Para validar tu voto necesitas <span className="text-amber-500 font-semibold">50 referidos activos</span> o haber contribuido.
               </p>
               <p className="text-xs text-center text-muted-foreground mt-1">
                 Actualmente tienes <span className="text-primary font-semibold">{completedReferrals}/{REQUIRED_REFERRALS}</span> referidos.
