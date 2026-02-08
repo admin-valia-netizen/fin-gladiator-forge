@@ -38,6 +38,16 @@ export const BronzePassport = () => {
   const { data, resetDemo, setStep, updateData, forceShowBronze, setForceShowBronze } = useRegistration();
   const { signOut } = useAuth();
   const navigate = useNavigate();
+    // Lógica de Blindaje: QR que cambia cada 60 segundos
+  const [timeSeed, setTimeSeed] = useState(Math.floor(Date.now() / 60000));
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTimeSeed(Math.floor(Date.now() / 60000));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
   const [showDonationModal, setShowDonationModal] = useState(false);
   const [syncingFromDb, setSyncingFromDb] = useState(true);
   const [completedReferrals, setCompletedReferrals] = useState(0);
@@ -273,7 +283,7 @@ export const BronzePassport = () => {
                 transition={{ delay: 0.5, type: 'spring' }}
               >
                 <QRCodeSVG
-                  value={data.qrCode || `FIN-${data.cedula}`}
+                  value={'FIN-' + (data.registrationId || data.cedula) + '-' + timeSeed}
                   size={120}
                   level="H"
                   includeMargin={false}
@@ -283,10 +293,10 @@ export const BronzePassport = () => {
               </motion.div>
             </div>
 
-            {/* QR Code label */}
+            {{/* QR Code label */}
             <div className="text-center">
               <p className="text-[10px] text-muted-foreground font-mono">
-                {data.qrCode || `FIN-${data.cedula}`}
+                {(data.registrationId || data.cedula)}-DYN
               </p>
             </div>
           </div>
