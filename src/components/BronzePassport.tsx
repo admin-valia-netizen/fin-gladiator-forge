@@ -38,8 +38,7 @@ export const BronzePassport = () => {
   const { data, resetDemo, setStep, updateData, forceShowBronze, setForceShowBronze } = useRegistration();
   const { signOut } = useAuth();
   const navigate = useNavigate();
-  
-  // Lógica de Blindaje: QR que cambia cada 60 segundos
+    // Lógica de Blindaje: QR que cambia cada 60 segundos
   const [timeSeed, setTimeSeed] = useState(Math.floor(Date.now() / 60000));
 
   useEffect(() => {
@@ -450,7 +449,12 @@ export const BronzePassport = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.9 }}
         >
-          <Button variant="outline" size="lg" onClick={handleLogout} className="w-full">
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={handleLogout}
+            className="w-full"
+          >
             <LogOut className="w-5 h-5 mr-2" />
             Cerrar Sesión
           </Button>
@@ -462,7 +466,12 @@ export const BronzePassport = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1 }}
         >
-          <Button variant="ghost" size="lg" onClick={resetDemo} className="w-full text-muted-foreground">
+          <Button
+            variant="ghost"
+            size="lg"
+            onClick={resetDemo}
+            className="w-full text-muted-foreground hover:text-foreground"
+          >
             <RotateCcw className="w-4 h-4 mr-2" />
             Ver Demo Completa (Reiniciar)
           </Button>
