@@ -107,12 +107,15 @@ export type Database = {
         Row: {
           apellidos: string | null
           apodo: string | null
+          barrio_sector: string | null
           calle: string | null
           categoria: string | null
           cedula: string
           cedula_back_url: string | null
           cedula_front_url: string | null
           circunscripcion: string | null
+          ciudad: string | null
+          correo: string | null
           created_at: string
           distrito_municipal: string | null
           donation_status: string | null
@@ -125,16 +128,22 @@ export type Database = {
           numero_casa: string | null
           oath_accepted: boolean | null
           ocupacion: string | null
+          paraje_seccion: string | null
           passport_level: string | null
           phone: string
           provincia: string | null
           qr_code: string | null
+          referidor_cedula: string | null
+          referidor_nombre: string | null
+          referidor_telefono: string | null
           referral_code: string | null
           referred_by: string | null
           region: string | null
+          residencial_nombre: string | null
           sector: string | null
           selfie_url: string | null
           signature_confirmed: boolean | null
+          telefono_otro: string | null
           telefono_residencial: string | null
           telefono_trabajo: string | null
           updated_at: string
@@ -147,12 +156,15 @@ export type Database = {
         Insert: {
           apellidos?: string | null
           apodo?: string | null
+          barrio_sector?: string | null
           calle?: string | null
           categoria?: string | null
           cedula: string
           cedula_back_url?: string | null
           cedula_front_url?: string | null
           circunscripcion?: string | null
+          ciudad?: string | null
+          correo?: string | null
           created_at?: string
           distrito_municipal?: string | null
           donation_status?: string | null
@@ -165,16 +177,22 @@ export type Database = {
           numero_casa?: string | null
           oath_accepted?: boolean | null
           ocupacion?: string | null
+          paraje_seccion?: string | null
           passport_level?: string | null
           phone: string
           provincia?: string | null
           qr_code?: string | null
+          referidor_cedula?: string | null
+          referidor_nombre?: string | null
+          referidor_telefono?: string | null
           referral_code?: string | null
           referred_by?: string | null
           region?: string | null
+          residencial_nombre?: string | null
           sector?: string | null
           selfie_url?: string | null
           signature_confirmed?: boolean | null
+          telefono_otro?: string | null
           telefono_residencial?: string | null
           telefono_trabajo?: string | null
           updated_at?: string
@@ -187,12 +205,15 @@ export type Database = {
         Update: {
           apellidos?: string | null
           apodo?: string | null
+          barrio_sector?: string | null
           calle?: string | null
           categoria?: string | null
           cedula?: string
           cedula_back_url?: string | null
           cedula_front_url?: string | null
           circunscripcion?: string | null
+          ciudad?: string | null
+          correo?: string | null
           created_at?: string
           distrito_municipal?: string | null
           donation_status?: string | null
@@ -205,16 +226,22 @@ export type Database = {
           numero_casa?: string | null
           oath_accepted?: boolean | null
           ocupacion?: string | null
+          paraje_seccion?: string | null
           passport_level?: string | null
           phone?: string
           provincia?: string | null
           qr_code?: string | null
+          referidor_cedula?: string | null
+          referidor_nombre?: string | null
+          referidor_telefono?: string | null
           referral_code?: string | null
           referred_by?: string | null
           region?: string | null
+          residencial_nombre?: string | null
           sector?: string | null
           selfie_url?: string | null
           signature_confirmed?: boolean | null
+          telefono_otro?: string | null
           telefono_residencial?: string | null
           telefono_trabajo?: string | null
           updated_at?: string
