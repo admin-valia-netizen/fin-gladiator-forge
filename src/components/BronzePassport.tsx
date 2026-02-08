@@ -512,7 +512,7 @@ export const BronzePassport = () => {
             <RotateCcw className="w-4 h-4 mr-2" />
             Ver Demo Completa (Reiniciar)
           </Button>
-                        </motion.div>
+                                </motion.div>
       </div>
 
       {/* Bottom bronze accent */}
