@@ -38,7 +38,8 @@ export const BronzePassport = () => {
   const { data, resetDemo, setStep, updateData, forceShowBronze, setForceShowBronze } = useRegistration();
   const { signOut } = useAuth();
   const navigate = useNavigate();
-    // Lógica de Blindaje: QR que cambia cada 60 segundos
+  
+  // Lógica de Blindaje: QR que cambia cada 60 segundos
   const [timeSeed, setTimeSeed] = useState(Math.floor(Date.now() / 60000));
 
   useEffect(() => {
@@ -57,7 +58,6 @@ export const BronzePassport = () => {
     const syncPassportLevel = async () => {
       console.log('[BronzePassport] Syncing - registrationId:', data.registrationId, 'cedula:', data.cedula);
       
-      // Try to find registration by ID first, then by cedula as fallback
       let query = supabase
         .from('registrations')
         .select('id, passport_level, donation_status, user_level');
@@ -80,34 +80,26 @@ export const BronzePassport = () => {
         if (error) throw error;
 
         if (registration) {
-          // Update registrationId if we found it by cedula
           if (!data.registrationId && registration.id) {
             updateData({ registrationId: registration.id });
           }
 
-          // Update local state with DB values
           updateData({
             passportLevel: registration.passport_level as any,
             userLevel: registration.user_level as any,
           });
 
-          console.log('[BronzePassport] Passport level from DB:', registration.passport_level);
-
-          // If passport is golden, redirect to golden passport
           if (registration.passport_level === 'dorado' && !forceShowBronze) {
-            console.log('[BronzePassport] Redirecting to golden-passport');
             setStep('golden-passport');
             return;
           }
 
-          // If donation was approved, update local state
           if (registration.donation_status === 'approved' && !forceShowBronze) {
             updateData({ passportLevel: 'dorado' });
             setStep('golden-passport');
             return;
           }
 
-          // If donation is pending, update local state
           if (registration.donation_status === 'pending') {
             updateData({ passportLevel: 'pending_donation' });
           }
@@ -149,12 +141,8 @@ export const BronzePassport = () => {
   const handleLogout = async () => {
     await signOut();
     resetDemo();
-    
-    // Clear all storage
     localStorage.clear();
     sessionStorage.clear();
-    
-    // Navigate to session closed page
     navigate('/session-closed', { replace: true });
   };
 
@@ -168,15 +156,11 @@ export const BronzePassport = () => {
     setStep('staircase');
   };
 
-  // Check if donation is pending
   const isDonationPending = data.passportLevel === 'pending_donation';
-
-  // Check if user can validate vote (has 50 referrals OR is golden passport holder)
   const hasEnoughReferrals = completedReferrals >= REQUIRED_REFERRALS;
   const isGoldenPassport = data.passportLevel === 'dorado';
   const canValidateVote = hasEnoughReferrals || isGoldenPassport || isDonationPending;
 
-  // Show loading while syncing
   if (syncingFromDb) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -195,17 +179,14 @@ export const BronzePassport = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col p-3 pb-6">
-      {/* Background */}
       <div className="absolute inset-0 bg-gradient-carbon" />
       
-      {/* Content */}
       <motion.div
         className="relative z-10 flex-1 flex flex-col items-center max-w-md mx-auto w-full pt-2"
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5 }}
       >
-        {/* Back button */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -222,7 +203,6 @@ export const BronzePassport = () => {
           </Button>
         </motion.div>
 
-        {/* Success message */}
         <motion.div
           className="text-center mb-4"
           initial={{ opacity: 0, y: -20 }}
@@ -235,14 +215,12 @@ export const BronzePassport = () => {
           <p className="text-muted-foreground">Tu Pasaporte de Bronce está listo</p>
         </motion.div>
 
-        {/* Passport card - compact */}
         <motion.div
           className="w-full card-industrial rounded-xl overflow-hidden border border-bronze/30"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
         >
-          {/* Header - compact */}
           <div className="bg-gradient-bronze p-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -256,9 +234,7 @@ export const BronzePassport = () => {
             </div>
           </div>
 
-          {/* Body - compact */}
           <div className="p-4 space-y-4">
-            {/* User info */}
             <div className="flex gap-3 items-center">
               <div className="flex-1 min-w-0">
                 <p className="text-[10px] text-muted-foreground mb-0.5">NOMBRE</p>
@@ -274,7 +250,6 @@ export const BronzePassport = () => {
               )}
             </div>
 
-            {/* QR Code - smaller */}
             <div className="flex justify-center">
               <motion.div
                 className="p-3 bg-foreground rounded-lg"
@@ -293,19 +268,16 @@ export const BronzePassport = () => {
               </motion.div>
             </div>
           
-            {/* QR Code label */}
             <div className="text-center mt-2">
               <p className="text-[10px] text-muted-foreground font-mono">
                 {(data.registrationId || data.id || '').substring(0, 8).toUpperCase()}-DYN
               </p>
             </div>
 
-            {/* Bronze border decoration */}
             <div className="h-2 bg-gradient-to-r from-amber-700 via-amber-500 to-amber-700 mt-4 rounded-full opacity-50 w-full" />
           </div>
         </motion.div>
 
-        {/* Vote validation CTA */}
         <motion.div
           className="w-full mt-6"
           initial={{ opacity: 0, y: 20 }}
@@ -328,7 +300,6 @@ export const BronzePassport = () => {
           </Button>
         </motion.div>
 
-        {/* Requirement message if button is disabled */}
         {!canValidateVote && (
           <motion.div
             className="w-full mt-2"
@@ -344,7 +315,6 @@ export const BronzePassport = () => {
           </motion.div>
         )}
 
-        {/* Donation Option */}
         <motion.div
           className="w-full mt-4"
           initial={{ opacity: 0, y: 20 }}
@@ -374,7 +344,6 @@ export const BronzePassport = () => {
           )}
         </motion.div>
 
-        {/* Important next steps message */}
         <motion.div
           className="w-full mt-6 card-industrial p-5 rounded-xl border-l-4 border-primary"
           initial={{ opacity: 0, y: 20 }}
@@ -402,7 +371,6 @@ export const BronzePassport = () => {
           </p>
         </motion.div>
 
-        {/* Map of FIN tables for signature */}
         <motion.div
           className="w-full mt-6"
           initial={{ opacity: 0, y: 20 }}
@@ -412,7 +380,6 @@ export const BronzePassport = () => {
           <FinTablesMapCard />
         </motion.div>
 
-        {/* Integrity Map Button */}
         <motion.div
           className="w-full mt-4"
           initial={{ opacity: 0, y: 20 }}
@@ -430,7 +397,6 @@ export const BronzePassport = () => {
           </Button>
         </motion.div>
 
-        {/* Referral System */}
         <motion.div
           className="w-full mt-6"
           initial={{ opacity: 0, y: 20 }}
@@ -443,8 +409,6 @@ export const BronzePassport = () => {
           />
         </motion.div>
 
-
-        {/* Locked benefits */}
         <motion.div
           className="w-full mt-6 space-y-4"
           initial={{ opacity: 0 }}
@@ -480,63 +444,33 @@ export const BronzePassport = () => {
           </div>
         </motion.div>
 
-        {/* Logout button */}
         <motion.div
           className="w-full mt-8"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.9 }}
         >
-          <Button
-            variant="outline"
-            size="lg"
-            onClick={handleLogout}
-            className="w-full"
-          >
+          <Button variant="outline" size="lg" onClick={handleLogout} className="w-full">
             <LogOut className="w-5 h-5 mr-2" />
             Cerrar Sesión
           </Button>
         </motion.div>
 
-        {/* Demo reset button - visible for testing */}
         <motion.div
           className="w-full mt-4"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1 }}
         >
-          <Button
-            variant="ghost"
-            size="lg"
-            onClick={resetDemo}
-            className="w-full text-muted-foreground hover:text-foreground"
-          >
+          <Button variant="ghost" size="lg" onClick={resetDemo} className="w-full text-muted-foreground">
             <RotateCcw className="w-4 h-4 mr-2" />
             Ver Demo Completa (Reiniciar)
           </Button>
         </motion.div>
-
-        {/* Mensaje de requisito duplicado eliminado para evitar error de sintaxis */}
-        {!canValidateVote && (
-          <motion.div
-            className="w-full mt-2"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-          >
-            <p className="text-xs text-center text-muted-foreground">
-              Para validar tu voto necesitas <span className="text-amber-500 font-semibold">50 referidos activos</span> o haber contribuido.
-            </p>
-            <p className="text-xs text-center text-muted-foreground mt-1">
-              Actualmente tienes <span className="text-primary font-semibold">{completedReferrals}/{REQUIRED_REFERRALS}</span> referidos.
-            </p>
-          </motion.div>
-        )}
       </motion.div>
 
-      {/* Bottom bronze accent */}
       <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-700 via-amber-500 to-amber-700" />
 
-      {/* Donation Modal */}
       {showDonationModal && (
         <DonationModule
           onClose={() => setShowDonationModal(false)}
