@@ -1,4 +1,4 @@
-hiimport { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
@@ -512,7 +512,7 @@ export const BronzePassport = () => {
             <RotateCcw className="w-4 h-4 mr-2" />
             Ver Demo Completa (Reiniciar)
           </Button>
-                </motion.div>
+                        </motion.div>
       </div>
 
       {/* Bottom bronze accent */}
@@ -531,5 +531,3 @@ export const BronzePassport = () => {
 
 export default BronzePassport;
         
-  );
-};
