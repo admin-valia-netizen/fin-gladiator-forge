@@ -293,9 +293,9 @@ export const BronzePassport = () => {
               </motion.div>
             </div>
           
-          {/* QR Code label */}
-          <div className="text-center">
-            <p className="text-[10px] text-muted-foreground font-mono mt-1">
+                    {/* QR Code label */}
+          <div className="text-center mt-2">
+            <p className="text-[10px] text-muted-foreground font-mono">
               {(data.registrationId || data.id || '').substring(0, 8).toUpperCase()}-DYN
             </p>
           </div>
