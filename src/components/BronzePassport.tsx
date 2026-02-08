@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+hiimport { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
@@ -292,6 +292,7 @@ export const BronzePassport = () => {
                 />
               </motion.div>
             </div>
+          
           {/* QR Code label */}
           <div className="text-center">
             <p className="text-[10px] text-muted-foreground font-mono mt-1">
@@ -300,8 +301,7 @@ export const BronzePassport = () => {
           </div>
 
           {/* Bronze border decoration */}
-          <div className="h-2 bg-gradient-bronze" />
-        </motion.div>
+          <div className="h-2 bg-gradient-to-r from-amber-700 via-amber-500 to-amber-700 mt-4 rounded-full opacity-50" />
 
         {/* Vote validation CTA */}
         <motion.div
