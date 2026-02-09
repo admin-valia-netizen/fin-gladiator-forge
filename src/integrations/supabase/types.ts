@@ -364,6 +364,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      validate_cedula_format: { Args: { p_cedula: string }; Returns: boolean }
       validate_referral_code: { Args: { p_code: string }; Returns: boolean }
     }
     Enums: {

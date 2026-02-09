@@ -33,6 +33,25 @@ const FRENTES_SECTORIALES = [
   'Salud', 'Transporte', 'Tecnología', 'Veteranos', 'Ninguno', 'Otro'
 ];
 
+// Dominican Cedula Luhn Algorithm Validation
+const validateDominicanCedula = (cedula: string): boolean => {
+  if (!/^\d{11}$/.test(cedula)) return false;
+  
+  let sum = 0;
+  for (let i = 0; i < 10; i++) {
+    let digit = parseInt(cedula[i], 10);
+    const multiplier = i % 2 === 0 ? 1 : 2;
+    digit *= multiplier;
+    if (digit >= 10) {
+      digit = Math.floor(digit / 10) + (digit % 10);
+    }
+    sum += digit;
+  }
+  
+  const checkDigit = (10 - (sum % 10)) % 10;
+  return checkDigit === parseInt(cedula[10], 10);
+};
+
 const registrationSchema = z.object({
   // UBICACIÓN
   provincia: z.string().min(1, 'Requerido'),
@@ -46,12 +65,18 @@ const registrationSchema = z.object({
   categoria: z.enum(['simpatizante', 'militante']),
   
   // REFERIDOR
-  referidorCedula: z.string().regex(/^\d{11}$/, 'Debe tener 11 dígitos').optional().or(z.literal('')),
+  referidorCedula: z.string()
+    .refine(val => !val || /^\d{11}$/.test(val), 'Debe tener 11 dígitos')
+    .refine(val => !val || validateDominicanCedula(val), 'Cédula de referidor inválida')
+    .optional()
+    .or(z.literal('')),
   referidorNombre: z.string().max(100).optional(),
   referidorTelefono: z.string().regex(/^\d{10}$/, 'Debe tener 10 dígitos').optional().or(z.literal('')),
   
   // DATOS PERSONALES
-  cedula: z.string().regex(/^\d{11}$/, 'La cédula debe tener 11 dígitos'),
+  cedula: z.string()
+    .regex(/^\d{11}$/, 'La cédula debe tener 11 dígitos')
+    .refine(validateDominicanCedula, 'Número de cédula inválido (verificación fallida)'),
   nombres: z.string().min(2, 'Mínimo 2 caracteres').max(50),
   apellidos: z.string().min(2, 'Mínimo 2 caracteres').max(50),
   apodo: z.string().max(30).optional(),
@@ -238,8 +263,12 @@ export const RegistrationForm = () => {
         .single();
 
       if (error) {
-        if (error.code === '23505') {
-          toast.error('Esta cédula ya está registrada.');
+        if (error.code === '23505' || error.message?.includes('ya está inscrito')) {
+          toast.error('Este Gladiador ya está inscrito en el FIN');
+          return;
+        }
+        if (error.message?.includes('Formato de cédula inválido')) {
+          toast.error('Formato de cédula inválido. Debe contener 11 dígitos numéricos válidos.');
           return;
         }
         throw error;
