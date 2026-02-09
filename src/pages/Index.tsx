@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRegistration } from '@/hooks/useRegistration';
 import { useAuth } from '@/hooks/useAuth';
 import { SplashScreen } from '@/components/SplashScreen';
@@ -13,11 +13,42 @@ import { BronzePassport } from '@/components/BronzePassport';
 import { VoteValidationStep } from '@/components/VoteValidationStep';
 import { GoldenPassport } from '@/components/GoldenPassport';
 import { AdminButton } from '@/components/AdminButton';
+import { CommunicationsInbox } from '@/components/CommunicationsInbox';
 import { Navigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Mail } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { supabase } from '@/integrations/supabase/client';
+
 const Index = () => {
   const { currentStep, setStep, resetDemo } = useRegistration();
   const { isAuthenticated, loading } = useAuth();
+  const [showInbox, setShowInbox] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  // Fetch unread count
+  useEffect(() => {
+    const fetchUnreadCount = async () => {
+      if (!isAuthenticated) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('communications')
+          .select('id');
+        
+        if (error) throw error;
+        
+        const stored = localStorage.getItem('fin-read-messages');
+        const readMessages = stored ? new Set(JSON.parse(stored)) : new Set();
+        const unread = (data || []).filter(c => !readMessages.has(c.id)).length;
+        setUnreadCount(unread);
+      } catch (err) {
+        console.error('Error fetching unread count:', err);
+      }
+    };
+
+    fetchUnreadCount();
+  }, [isAuthenticated, showInbox]);
 
   // Force splash on first load if state is corrupted or old format
   useEffect(() => {
@@ -86,6 +117,30 @@ const Index = () => {
   return (
     <>
       <AdminButton />
+      
+      {/* Inbox Button - shown for authenticated users */}
+      <Button
+        variant="ghost"
+        size="icon"
+        className="fixed top-4 left-4 z-50 bg-card/80 backdrop-blur-sm border border-[#0047AB]/30 hover:bg-[#0047AB]/20"
+        onClick={() => setShowInbox(true)}
+        title="Centro de Comunicaciones"
+      >
+        <Mail className="w-5 h-5 text-[#0047AB]" />
+        {unreadCount > 0 && (
+          <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-[#FF6B00] text-white text-xs flex items-center justify-center font-bold">
+            {unreadCount > 9 ? '9+' : unreadCount}
+          </span>
+        )}
+      </Button>
+
+      {/* Communications Inbox Modal */}
+      <AnimatePresence>
+        {showInbox && (
+          <CommunicationsInbox onClose={() => setShowInbox(false)} />
+        )}
+      </AnimatePresence>
+
       <div className="min-h-screen bg-background">
         {currentStep === 'registration' && <RegistrationForm />}
         {currentStep === 'quick-verify' && <QuickVerification />}
