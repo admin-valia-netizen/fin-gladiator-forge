@@ -10,13 +10,14 @@ import {
   Crown,
   ArrowLeft,
   Users,
-   Clock,
-   DollarSign,
-   Download,
-   Settings,
-   Trash2,
-   BookOpen,
-   RefreshCw
+  Clock,
+  DollarSign,
+  Download,
+  Settings,
+  Trash2,
+  BookOpen,
+  RefreshCw,
+  MessageSquare
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -50,6 +51,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Navigate, useNavigate } from 'react-router-dom';
+import { AdminCommunications } from '@/components/AdminCommunications';
 
 interface DonationRequest {
   id: string;
@@ -655,10 +657,14 @@ export default function Admin() {
           transition={{ delay: 0.2 }}
         >
           <Tabs defaultValue="donations" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 mb-6">
+            <TabsList className="grid w-full grid-cols-4 mb-6">
               <TabsTrigger value="donations" className="flex items-center gap-2">
                 <Crown className="w-4 h-4" />
                 Donaciones
+              </TabsTrigger>
+              <TabsTrigger value="communications" className="flex items-center gap-2">
+                <MessageSquare className="w-4 h-4" />
+                Comunicados
               </TabsTrigger>
               <TabsTrigger value="sponsors" className="flex items-center gap-2">
                 <Download className="w-4 h-4" />
@@ -774,6 +780,11 @@ export default function Admin() {
                   )}
                 </CardContent>
               </Card>
+            </TabsContent>
+
+            {/* Communications Tab */}
+            <TabsContent value="communications">
+              <AdminCommunications />
             </TabsContent>
 
             {/* Sponsors Export Tab */}
