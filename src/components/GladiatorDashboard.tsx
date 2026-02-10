@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
 import {
-  Shield, Lock, Smartphone, Zap, Bike, Users, CheckCircle2,
+  Shield, Lock, Unlock, Users, CheckCircle2,
   Trophy, Star, Award, ChevronRight, Loader2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -13,18 +13,17 @@ import { useRegistration } from '@/hooks/useRegistration';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 
+import rewardCelularImg from '@/assets/reward-celular.jpg';
+import rewardPatinetaImg from '@/assets/reward-patineta.jpg';
+import rewardPasolaImg from '@/assets/reward-pasola.jpg';
+
 const REQUIRED_REFERRALS = 50;
-const POINTS_CONFIG = {
-  referralValidated: 10,
-  physicalSignature: 50,
-  centurionBonus: 500,
-};
 
 interface Reward {
   id: string;
   name: string;
   cost: number;
-  icon: React.ReactNode;
+  image: string;
   description: string;
 }
 
@@ -32,23 +31,23 @@ const REWARDS: Reward[] = [
   {
     id: 'celular',
     name: 'Celular Pro',
-    cost: 500,
-    icon: <Smartphone className="w-8 h-8" />,
-    description: 'Smartphone de última generación',
+    cost: 100,
+    image: rewardCelularImg,
+    description: 'Smartphone de alta gama',
   },
   {
     id: 'patineta',
     name: 'Patineta Eléctrica',
-    cost: 1500,
-    icon: <Zap className="w-8 h-8" />,
+    cost: 200,
+    image: rewardPatinetaImg,
     description: 'Patineta eléctrica de alta autonomía',
   },
   {
-    id: 'motor',
-    name: 'Motor FIN',
-    cost: 5000,
-    icon: <Bike className="w-8 h-8" />,
-    description: 'Motocicleta oficial del movimiento',
+    id: 'pasola',
+    name: 'Pasola Eléctrica',
+    cost: 300,
+    image: rewardPasolaImg,
+    description: 'Pasola/Scooter eléctrica de última generación',
   },
 ];
 
@@ -60,7 +59,6 @@ interface LegionSlot {
 export const GladiatorDashboard = () => {
   const { data } = useRegistration();
   const { user } = useAuth();
-  const [totalPoints, setTotalPoints] = useState(0);
   const [integrityIndex, setIntegrityIndex] = useState(100);
   const [isCenturion, setIsCenturion] = useState(false);
   const [referrals, setReferrals] = useState<LegionSlot[]>([]);
@@ -79,15 +77,15 @@ export const GladiatorDashboard = () => {
       }
 
       try {
-        // Fetch points summary
+        // Points = number of validated referrals (1 referral = 1 point)
+        // We still fetch summary for integrity_index and centurion_status
         const { data: summary } = await supabase
           .from('points_summary')
-          .select('total_points, integrity_index, centurion_status')
+          .select('integrity_index, centurion_status')
           .eq('registration_id', data.registrationId)
           .maybeSingle();
 
         if (summary) {
-          setTotalPoints(summary.total_points);
           setIntegrityIndex(summary.integrity_index);
           setIsCenturion(summary.centurion_status);
         }
@@ -119,16 +117,19 @@ export const GladiatorDashboard = () => {
     fetchData();
   }, [data.registrationId, user?.id, referralCode]);
 
+  const completedReferrals = referrals.filter(s => 
+    s.referral?.passport_level === 'bronce' || s.referral?.passport_level === 'dorado'
+  ).length;
+
+  // 1 valid referral = 1 point
+  const totalPoints = completedReferrals;
+
   // Calculate next reward progress
   const nextReward = REWARDS.find(r => r.cost > totalPoints) || REWARDS[REWARDS.length - 1];
   const prevRewardCost = REWARDS.filter(r => r.cost <= totalPoints).pop()?.cost || 0;
   const progressToNext = nextReward
     ? ((totalPoints - prevRewardCost) / (nextReward.cost - prevRewardCost)) * 100
     : 100;
-
-  const completedReferrals = referrals.filter(s => 
-    s.referral?.passport_level === 'bronce' || s.referral?.passport_level === 'dorado'
-  ).length;
 
   if (loading) {
     return (
@@ -205,20 +206,12 @@ export const GladiatorDashboard = () => {
                   <p className="text-sm text-steel-light mt-1">Puntos de Integridad</p>
                 </div>
 
-                {/* Points breakdown */}
-                <div className="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-gold/10">
-                  <div className="text-center">
-                    <p className="text-lg font-bold text-gold">{completedReferrals}</p>
-                    <p className="text-[10px] text-steel-light">Referidos</p>
-                  </div>
-                  <div className="text-center border-x border-gold/10">
-                    <p className="text-lg font-bold text-gold">+{POINTS_CONFIG.referralValidated}</p>
-                    <p className="text-[10px] text-steel-light">Por Registro</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-lg font-bold text-gold">+{POINTS_CONFIG.physicalSignature}</p>
-                    <p className="text-[10px] text-steel-light">Firma Mesa</p>
-                  </div>
+                {/* Motivational motto */}
+                <div className="mt-4 pt-4 border-t border-gold/10 text-center">
+                  <p className="text-sm font-semibold text-gold italic">
+                    🔥 3 referidos diarios te llevan a la meta 🔥
+                  </p>
+                  <p className="text-[10px] text-steel-light mt-1">1 referido validado = 1 Punto de Integridad</p>
                 </div>
               </CardContent>
             </Card>
@@ -228,10 +221,7 @@ export const GladiatorDashboard = () => {
               <CardContent className="p-4">
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-sm font-semibold text-foreground">Próxima Recompensa</p>
-                  <div className="flex items-center gap-1.5 text-gold">
-                    {nextReward.icon && <span className="scale-50">{nextReward.icon}</span>}
-                    <span className="text-sm font-bold">{nextReward.name}</span>
-                  </div>
+                  <span className="text-sm font-bold text-gold">{nextReward.name}</span>
                 </div>
                 <Progress value={Math.min(progressToNext, 100)} className="h-3 bg-steel/20" />
                 <div className="flex justify-between mt-1.5">
@@ -343,7 +333,7 @@ export const GladiatorDashboard = () => {
             className="space-y-4"
           >
             <div className="text-center mb-2">
-              <h3 className="text-lg font-bold text-foreground">Recompensas por Mérito</h3>
+              <h3 className="text-lg font-bold text-foreground">RECOMPENSAS POR MÉRITO</h3>
               <p className="text-sm text-steel-light">
                 Saldo: <span className="text-gold font-bold">{totalPoints.toLocaleString()} pts</span>
               </p>
@@ -363,35 +353,40 @@ export const GladiatorDashboard = () => {
                       ? 'border-gold/50 shadow-[0_0_20px_hsl(45_90%_50%/0.15)]'
                       : 'border-steel/20 opacity-70'
                   }`}>
-                    <CardContent className="p-4 flex items-center gap-4 relative">
+                    <CardContent className="p-0 flex items-stretch relative">
                       {!unlocked && (
                         <div className="absolute inset-0 bg-background/60 backdrop-blur-[2px] flex items-center justify-center z-10">
-                          <div className="flex items-center gap-2 text-steel">
-                            <Lock className="w-5 h-5" />
+                          <div className="flex flex-col items-center gap-1 text-steel">
+                            <Lock className="w-6 h-6" />
                             <span className="text-sm font-semibold">
                               {totalPoints < reward.cost
-                                ? `Faltan ${(reward.cost - totalPoints).toLocaleString()} pts`
+                                ? `Faltan ${(reward.cost - totalPoints)} pts`
                                 : 'Índice bajo'}
                             </span>
                           </div>
                         </div>
                       )}
-                      <div className={`w-14 h-14 rounded-xl flex items-center justify-center shrink-0 ${
-                        unlocked
-                          ? 'bg-gradient-to-br from-gold to-gold-dark text-background'
-                          : 'bg-steel/20 text-steel'
-                      }`}>
-                        {reward.icon}
+                      {unlocked && (
+                        <div className="absolute top-2 right-2 z-10">
+                          <Unlock className="w-5 h-5 text-gold" />
+                        </div>
+                      )}
+                      {/* Reward image */}
+                      <div className="w-28 h-28 shrink-0">
+                        <img
+                          src={reward.image}
+                          alt={reward.name}
+                          className="w-full h-full object-cover"
+                        />
                       </div>
-                      <div className="flex-1 min-w-0">
+                      <div className="flex-1 p-4 flex flex-col justify-center">
                         <p className="font-bold text-foreground">{reward.name}</p>
                         <p className="text-xs text-steel-light">{reward.description}</p>
-                        <div className="flex items-center gap-1 mt-1">
+                        <div className="flex items-center gap-1 mt-1.5">
                           <Star className="w-3 h-3 text-gold" />
-                          <span className="text-sm font-bold text-gold">{reward.cost.toLocaleString()} pts</span>
+                          <span className="text-sm font-bold text-gold">{reward.cost} pts</span>
                         </div>
                       </div>
-                      <ChevronRight className={`w-5 h-5 shrink-0 ${unlocked ? 'text-gold' : 'text-steel/30'}`} />
                     </CardContent>
                   </Card>
                 </motion.div>
@@ -408,16 +403,11 @@ export const GladiatorDashboard = () => {
               </CardHeader>
               <CardContent className="space-y-2 text-sm">
                 <div className="flex justify-between items-center py-1.5 border-b border-border/50">
-                  <span className="text-steel-light">Referido validado</span>
-                  <span className="font-bold text-gold">+{POINTS_CONFIG.referralValidated} pts</span>
+                  <span className="text-steel-light">1 referido validado</span>
+                  <span className="font-bold text-gold">= 1 punto</span>
                 </div>
-                <div className="flex justify-between items-center py-1.5 border-b border-border/50">
-                  <span className="text-steel-light">Firma física en Mesa</span>
-                  <span className="font-bold text-gold">+{POINTS_CONFIG.physicalSignature} pts</span>
-                </div>
-                <div className="flex justify-between items-center py-1.5">
-                  <span className="text-steel-light">Bono Centurión (50 referidos)</span>
-                  <span className="font-bold text-gold">+{POINTS_CONFIG.centurionBonus} pts</span>
+                <div className="py-2 text-center">
+                  <p className="text-gold font-semibold italic">🔥 3 referidos diarios te llevan a la meta 🔥</p>
                 </div>
               </CardContent>
             </Card>
