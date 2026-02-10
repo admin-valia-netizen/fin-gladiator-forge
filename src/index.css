@@ -57,6 +57,13 @@
     --carbon-light: 0 0% 10%;
     --carbon-dark: 0 0% 3%;
 
+    /* Gold Shield palette */
+    --gold: 45 90% 50%;
+    --gold-light: 45 85% 65%;
+    --gold-dark: 45 95% 35%;
+    --steel: 210 10% 40%;
+    --steel-light: 210 8% 55%;
+
     /* FIN Mapa (Provincias) - Alto contraste */
     --fin-map-steel: 210 10% 45%; /* Gris acero */
     --fin-map-victory: 220 100% 35%; /* Azul Victoria profundo */
