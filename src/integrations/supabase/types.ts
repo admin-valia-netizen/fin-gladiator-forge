@@ -91,6 +91,79 @@ export type Database = {
           },
         ]
       }
+      integrity_points: {
+        Row: {
+          created_at: string
+          id: string
+          points: number
+          reason: string
+          registration_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          points?: number
+          reason: string
+          registration_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          points?: number
+          reason?: string
+          registration_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "integrity_points_registration_id_fkey"
+            columns: ["registration_id"]
+            isOneToOne: false
+            referencedRelation: "registrations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      points_summary: {
+        Row: {
+          centurion_status: boolean
+          id: string
+          integrity_index: number
+          registration_id: string
+          total_points: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          centurion_status?: boolean
+          id?: string
+          integrity_index?: number
+          registration_id: string
+          total_points?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          centurion_status?: boolean
+          id?: string
+          integrity_index?: number
+          registration_id?: string
+          total_points?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "points_summary_registration_id_fkey"
+            columns: ["registration_id"]
+            isOneToOne: true
+            referencedRelation: "registrations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       province_counters: {
         Row: {
           cidp_activated: boolean
@@ -333,6 +406,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_integrity_points: {
+        Args: {
+          p_points: number
+          p_reason: string
+          p_registration_id: string
+          p_user_id: string
+        }
+        Returns: number
+      }
       get_donations_safe: {
         Args: { p_donation_id?: string }
         Returns: {

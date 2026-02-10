@@ -72,6 +72,15 @@ export default {
           light: "hsl(var(--carbon-light))",
           dark: "hsl(var(--carbon-dark))",
         },
+        gold: {
+          DEFAULT: "hsl(var(--gold))",
+          light: "hsl(var(--gold-light))",
+          dark: "hsl(var(--gold-dark))",
+        },
+        steel: {
+          DEFAULT: "hsl(var(--steel))",
+          light: "hsl(var(--steel-light))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

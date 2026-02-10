@@ -9,6 +9,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { ReferralSystem } from '@/components/ReferralSystem';
 import { FinTablesMapCard } from '@/components/FinTablesMapCard';
 import { DonationModule } from '@/components/DonationModule';
+import { GladiatorDashboard } from '@/components/GladiatorDashboard';
 import { supabase } from '@/integrations/supabase/client';
 
 const REQUIRED_REFERRALS = 50;
@@ -430,54 +431,14 @@ export const BronzePassport = () => {
           </Button>
         </motion.div>
 
-        {/* Referral System */}
+        {/* Gladiator Dashboard - Points, Legion & Rewards */}
         <motion.div
           className="w-full mt-6"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.55 }}
         >
-          <ReferralSystem 
-            referralCode={data.referralCode} 
-            registrationId={data.registrationId} 
-          />
-        </motion.div>
-
-
-        {/* Locked benefits */}
-        <motion.div
-          className="w-full mt-6 space-y-4"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.7 }}
-        >
-          <h2 className="text-center font-bold text-foreground flex items-center justify-center gap-2">
-            <Lock className="w-4 h-4 text-muted-foreground" />
-            Tu Recompensa (Bloqueada)
-          </h2>
-
-          <div className="grid grid-cols-2 gap-3">
-            {benefits.map((benefit, index) => (
-              <motion.div
-                key={benefit.id}
-                className="p-4 rounded-xl bg-muted/50 border border-muted flex items-center gap-3 opacity-60"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 0.6, x: 0 }}
-                transition={{ delay: 0.8 + index * 0.1 }}
-              >
-                <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
-                  {benefit.icon}
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-foreground">{benefit.title}</p>
-                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                    <Lock className="w-3 h-3" />
-                    Bloqueado
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+          <GladiatorDashboard />
         </motion.div>
 
         {/* Logout button */}
