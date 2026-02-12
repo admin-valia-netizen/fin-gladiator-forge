@@ -91,8 +91,9 @@ export const WelcomeMessage = ({ onContinue }: WelcomeMessageProps) => {
           />
           
           <p className="text-lg text-muted-foreground mb-8">
-            Bienvenido al{' '}
-            <span className="font-bold text-foreground">Frente de Integridad Nacional</span>
+            Bienvenido a{' '}
+            <span className="font-bold text-foreground">REFIDO</span>
+            {' '} · Reclutar · Firmar · Donar
           </p>
         </motion.div>
 

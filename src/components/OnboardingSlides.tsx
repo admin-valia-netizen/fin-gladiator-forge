@@ -17,20 +17,20 @@ interface Slide {
 const slides: Slide[] = [
   {
     id: 1,
-    title: "EL FIN DEL AMIGUISMO",
-    subtitle: "En la República Dominicana, el talento se apaga cuando las oportunidades se dan por 'cuña'. El Frente de Integridad Nacional (FIN) nace para romper esas cadenas. Somos el partido que limpia el camino para que tú llegues a donde tu esfuerzo te lleve, sin pedirle favores a nadie.",
+    title: "REFIDO: RECLUTAR · FIRMAR · DONAR",
+    subtitle: "Bienvenido a la Legión de Élite. REFIDO es el movimiento donde el mérito reemplaza al favoritismo. Aquí no se piden favores: se forja el destino con esfuerzo, integridad y honor. Únete y sé parte de algo más grande.",
     image: onboarding1,
   },
   {
     id: 2,
-    title: "TU IDENTIDAD ES TU PODER",
-    subtitle: "Esta plataforma es tu Escalera de Integridad. Aquí no solo te registras; validas quién eres de forma segura y moderna. Usamos biometría para asegurar que nuestra base de datos sea real y poderosa. Al registrarte aquí, proteges tu identidad y te aseguras un lugar en el nuevo gobierno del mérito.",
+    title: "MESAS DE FORJA OPERATIVAS",
+    subtitle: "Nuestro mapa operativo muestra cada Mesa de Forja activa en el territorio. Ubica la más cercana, firma presencialmente y sella tu compromiso. Cada mesa es un bastión de integridad donde los Gladiadores validan su identidad.",
     image: onboarding2,
   },
   {
     id: 3,
-    title: "LA FIRMA QUE CAMBIA TODO",
-    subtitle: "Para que la JCE oficialice nuestro partido, necesitamos tu firma en papel. Esta app es el primer paso: Regístrate digitalmente para validar tu integridad. Ubica tu Mesa de Forja más cercana en el mapa. Firma físicamente para sellar tu compromiso y activar tu acceso a la Recompensa del Gladiador. ¡Tu firma física es el anclaje legal de tu futuro!",
+    title: "TU PASAPORTE DE GLADIADOR",
+    subtitle: "Tu perfil de élite con doble escala de progreso: Rango de Mérito (Oro) basado en retos superados, y Rango de Popularidad (Plata) basado en los votos del público. El honor se gana con mérito; la fama con el voto del público.",
     image: onboarding3,
   },
 ];
@@ -218,7 +218,7 @@ export const OnboardingSlides = () => {
                     {currentSlide === slides.length - 1 ? (
                       <>
                         <Shield className="w-5 h-5" />
-                        ¡ÚNETE A FIN!
+                        ¡ÚNETE A REFIDO!
                       </>
                     ) : (
                       <>
