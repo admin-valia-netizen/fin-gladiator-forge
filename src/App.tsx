@@ -11,6 +11,7 @@ import Install from "./pages/Install";
 import Admin from "./pages/Admin";
 import SessionClosed from "./pages/SessionClosed";
 import IntegrityMap from "./pages/IntegrityMap";
+import RefidoDashboard from "./pages/RefidoDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +31,7 @@ const App = () => (
           <Route path="/admin" element={<Admin />} />
           <Route path="/session-closed" element={<SessionClosed />} />
           <Route path="/mapa-integridad" element={<IntegrityMap />} />
+          <Route path="/refido" element={<RefidoDashboard />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
